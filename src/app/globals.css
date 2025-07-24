@@ -1,8 +1,35 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'YourCustomFont';
+  src: url('/fonts/your-font-file.woff2') format('woff2'),
+       url('/fonts/your-font-file.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Add more @font-face declarations for different weights/styles */
+@font-face {
+  font-family: 'YourCustomFont';
+  src: url('/fonts/your-font-file-bold.woff2') format('woff2'),
+       url('/fonts/your-font-file-bold.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --bg: #fffffa;
+  --text-title: #2160a7;
+  --text-body: #34343b;
+  --text-grey: rgba(52, 52, 59, 0.5);
+  --font-family: "Montserrat", sans-serif;
+  --second-family: "Playfair Display", serif;
 }
 
 @theme inline {
@@ -19,8 +46,25 @@
   }
 }
 
-body {
+html, body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  height: 100%;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  position: fixed;
+  width: 100%;
+}
+
+/* Frosted glass text effect */
+.frosted-text {
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+  filter: blur(0.3px);
+}
+
+.glass-content {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
