@@ -67,11 +67,11 @@ const Window = ({ title, children, onClose, isActive = true, onClick }: WindowPr
       ref={windowRef}
       onClick={onClick}
       style={{
-        background: 'rgba(255, 255, 250, 0.5)',
-        backdropFilter: 'blur(25px)',
-        border: '1px solid rgba(33, 96, 167, 0.2)',
+        background: 'radial-gradient(ellipse at top left, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.2) 100%)',
+        backdropFilter: 'blur(42px)',
+        border: '3.5px solid rgba(255, 255, 255, 0.3)',
         borderRadius: '12px',
-        boxShadow: '0 8px 32px rgba(33, 96, 167, 0.15)',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
         overflow: 'hidden',
         minWidth: '400px',
         position: 'absolute',
@@ -79,22 +79,24 @@ const Window = ({ title, children, onClose, isActive = true, onClick }: WindowPr
         top: position.y,
         cursor: isDragging ? 'grabbing' : 'default',
         zIndex: isActive ? 1000 : 100,
-        transition: 'z-index 0.2s ease'
+        transition: 'z-index 0.2s ease',
+        backgroundClip: 'padding-box'
       }}
     >
       {/* Window Title Bar */}
       <div 
         onMouseDown={handleMouseDown}
         style={{
-          background: 'rgba(33, 96, 167, 0.6)',
+          background: 'rgba(255, 255, 255, 0.1)',
           backdropFilter: 'blur(15px)',
           padding: '12px 16px',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          borderBottom: '1px solid rgba(33, 96, 167, 0.3)',
           cursor: 'grab',
-          userSelect: 'none'
+          userSelect: 'none',
+          borderTopLeftRadius: '8px',
+          borderTopRightRadius: '8px'
         }}
       >
         <div 
@@ -102,7 +104,7 @@ const Window = ({ title, children, onClose, isActive = true, onClick }: WindowPr
             fontFamily: 'var(--font-family)',
             fontSize: '14px',
             fontWeight: '600',
-            color: 'var(--bg)'
+            color: 'rgba(0, 0, 0, 0.8)'
           }}
         >
           {title}
@@ -157,8 +159,10 @@ const Window = ({ title, children, onClose, isActive = true, onClick }: WindowPr
       {!isMinimized && (
         <div style={{ 
           padding: '24px',
-          background: 'rgba(255, 255, 250, 0.05)',
-          backdropFilter: 'blur(10px)'
+          background: 'transparent',
+          backdropFilter: 'blur(10px)',
+          borderBottomLeftRadius: '8px',
+          borderBottomRightRadius: '8px'
         }}>
           {children}
         </div>

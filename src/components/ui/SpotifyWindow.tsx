@@ -65,35 +65,37 @@ const SpotifyWindow = ({ playlistId = "6w9nkHE6jGkM9Zx7t0kcRr", onClose, isActiv
       ref={windowRef}
       onClick={onClick}
       style={{
-        background: 'rgba(255, 255, 250, 0.5)',
-        backdropFilter: 'blur(25px)',
-        border: '1px solid rgba(33, 96, 167, 0.2)',
+        background: 'radial-gradient(ellipse at top left, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 100%)',
+        backdropFilter: 'blur(42px)',
+        border: '3.5px solid rgba(255, 255, 255, 0.2)',
         borderRadius: '12px',
-        boxShadow: '0 8px 32px rgba(33, 96, 167, 0.15)',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
         overflow: 'hidden',
         width: isMinimized ? '280px' : '400px',
-        height: isMinimized ? 'auto' : '400px',
+        height: isMinimized ? 'auto' : '390px',
         position: 'absolute',
         left: position.x,
         top: position.y,
         cursor: isDragging ? 'grabbing' : 'default',
         transition: 'width 0.3s ease, height 0.3s ease, z-index 0.2s ease',
-        zIndex: isActive ? 1000 : 100
+        zIndex: isActive ? 1000 : 100,
+        backgroundClip: 'padding-box'
       }}
     >
       {/* Window Title Bar */}
       <div 
         onMouseDown={handleMouseDown}
         style={{
-          background: 'rgba(30, 215, 96, 0.6)',
-          backdropFilter: 'blur(10px)',
+          background: 'rgba(0, 0, 0, 0.1)',
+          backdropFilter: 'blur(15px)',
           padding: '12px 16px',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          borderBottom: '1px solid rgba(30, 215, 96, 0.3)',
           cursor: 'grab',
-          userSelect: 'none'
+          userSelect: 'none',
+          borderTopLeftRadius: '8px',
+          borderTopRightRadius: '8px'
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -161,8 +163,10 @@ const SpotifyWindow = ({ playlistId = "6w9nkHE6jGkM9Zx7t0kcRr", onClose, isActiv
       {!isMinimized && (
         <div style={{ 
           height: '100%',
-          background: 'rgba(255, 255, 250, 0.1)',
-          backdropFilter: 'blur(5px)'
+          background: 'transparent',
+          backdropFilter: 'blur(10px)',
+          borderBottomLeftRadius: '8px',
+          borderBottomRightRadius: '8px'
         }}>
           <iframe
             src={`https://open.spotify.com/embed/playlist/${playlistId}?utm_source=generator&theme=0&autoplay=1&show_cover_art=true`}
