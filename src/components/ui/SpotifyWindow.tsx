@@ -11,7 +11,7 @@ interface SpotifyWindowProps {
 
 const SpotifyWindow = ({ playlistId = "6w9nkHE6jGkM9Zx7t0kcRr", onClose, isActive = true, onClick }: SpotifyWindowProps) => {
   const [isMinimized, setIsMinimized] = useState(false);
-  const [position, setPosition] = useState({ x: 100, y: 100 });
+  const [position, setPosition] = useState({ x: 700, y: 100 }); // Position to right of intro window
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const windowRef = useRef<HTMLDivElement>(null);
@@ -22,15 +22,12 @@ const SpotifyWindow = ({ playlistId = "6w9nkHE6jGkM9Zx7t0kcRr", onClose, isActiv
       onClick();
     }
     
-    if (windowRef.current) {
-      const rect = windowRef.current.getBoundingClientRect();
-      setDragStart({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
-      });
-      setIsDragging(true);
-    }
-  }, [onClick]);
+    setDragStart({
+      x: e.clientX - position.x,
+      y: e.clientY - position.y
+    });
+    setIsDragging(true);
+  }, [onClick, position.x, position.y]);
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (isDragging) {
@@ -64,10 +61,11 @@ const SpotifyWindow = ({ playlistId = "6w9nkHE6jGkM9Zx7t0kcRr", onClose, isActiv
     <div 
       ref={windowRef}
       onClick={onClick}
+      className="spotify-window"
       style={{
-        background: 'radial-gradient(ellipse at top left, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 100%)',
+        background: '#1f1f1f',
         backdropFilter: 'blur(42px)',
-        border: '3.5px solid rgba(255, 255, 255, 0.2)',
+        border: '0.25px solid rgba(255, 255, 255, 0.2)',
         borderRadius: '12px',
         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
         overflow: 'hidden',
@@ -78,8 +76,7 @@ const SpotifyWindow = ({ playlistId = "6w9nkHE6jGkM9Zx7t0kcRr", onClose, isActiv
         top: position.y,
         cursor: isDragging ? 'grabbing' : 'default',
         transition: 'width 0.3s ease, height 0.3s ease, z-index 0.2s ease',
-        zIndex: isActive ? 1000 : 100,
-        backgroundClip: 'padding-box'
+        zIndex: isActive ? 40 : 30
       }}
     >
       {/* Window Title Bar */}
@@ -110,7 +107,7 @@ const SpotifyWindow = ({ playlistId = "6w9nkHE6jGkM9Zx7t0kcRr", onClose, isActiv
               color: 'white'
             }}
           >
-            spotify-vibes.exe
+            Spotify
           </div>
         </div>
         
@@ -119,18 +116,36 @@ const SpotifyWindow = ({ playlistId = "6w9nkHE6jGkM9Zx7t0kcRr", onClose, isActiv
           <button
             onClick={() => setIsMinimized(!isMinimized)}
             style={{
-              width: '16px',
-              height: '16px',
+              width: '12px',
+              height: '12px',
               borderRadius: '50%',
               border: 'none',
-              backgroundColor: '#FFD700',
+              background: '#FFBD2E',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center'
+              justifyContent: 'center',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = '#FFB000';
+              const span = e.currentTarget.querySelector('span');
+              if (span) span.style.opacity = '1';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = '#FFBD2E';
+              const span = e.currentTarget.querySelector('span');
+              if (span) span.style.opacity = '0';
             }}
           >
-            <span style={{ fontSize: '10px', fontWeight: 'bold', color: '#000' }}>
+            <span style={{ 
+              fontSize: '8px', 
+              fontWeight: '700', 
+              color: 'rgba(0, 0, 0, 0.7)',
+              fontFamily: 'var(--font-family)',
+              opacity: '0',
+              transition: 'opacity 0.2s ease'
+            }}>
               {isMinimized ? '+' : '−'}
             </span>
           </button>
@@ -140,18 +155,36 @@ const SpotifyWindow = ({ playlistId = "6w9nkHE6jGkM9Zx7t0kcRr", onClose, isActiv
             <button
               onClick={onClose}
               style={{
-                width: '16px',
-                height: '16px',
+                width: '12px',
+                height: '12px',
                 borderRadius: '50%',
                 border: 'none',
-                backgroundColor: '#FF5F5F',
+                background: '#FF5F57',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#FF3B30';
+                const span = e.currentTarget.querySelector('span');
+                if (span) span.style.opacity = '1';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = '#FF5F57';
+                const span = e.currentTarget.querySelector('span');
+                if (span) span.style.opacity = '0';
               }}
             >
-              <span style={{ fontSize: '10px', fontWeight: 'bold', color: '#fff' }}>
+              <span style={{ 
+                fontSize: '8px', 
+                fontWeight: '700', 
+                color: 'rgba(0, 0, 0, 0.7)',
+                fontFamily: 'var(--font-family)',
+                opacity: '0',
+                transition: 'opacity 0.2s ease'
+              }}>
                 ×
               </span>
             </button>
@@ -164,9 +197,8 @@ const SpotifyWindow = ({ playlistId = "6w9nkHE6jGkM9Zx7t0kcRr", onClose, isActiv
         <div style={{ 
           height: '100%',
           background: 'transparent',
-          backdropFilter: 'blur(10px)',
-          borderBottomLeftRadius: '8px',
-          borderBottomRightRadius: '8px'
+          borderBottomLeftRadius: '12px',
+          borderBottomRightRadius: '12px'
         }}>
           <iframe
             src={`https://open.spotify.com/embed/playlist/${playlistId}?utm_source=generator&theme=0&autoplay=1&show_cover_art=true`}

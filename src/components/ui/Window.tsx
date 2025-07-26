@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { useTheme } from '../../context/ThemeContext';
 
 interface WindowProps {
   title: string;
@@ -8,14 +9,19 @@ interface WindowProps {
   onClose?: () => void;
   isActive?: boolean;
   onClick?: () => void;
+  initialPosition?: { x: number; y: number };
 }
 
-const Window = ({ title, children, onClose, isActive = true, onClick }: WindowProps) => {
+const Window = ({ title, children, onClose, isActive = true, onClick, initialPosition }: WindowProps) => {
   const [isMinimized, setIsMinimized] = useState(false);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [position, setPosition] = useState(initialPosition || { x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const windowRef = useRef<HTMLDivElement>(null);
+  const { getWindowStyles, getTextStyles } = useTheme();
+  
+  const windowStyles = getWindowStyles();
+  const textStyles = getTextStyles();
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     // Bring window to front immediately on mouse down
@@ -23,15 +29,12 @@ const Window = ({ title, children, onClose, isActive = true, onClick }: WindowPr
       onClick();
     }
     
-    if (windowRef.current) {
-      const rect = windowRef.current.getBoundingClientRect();
-      setDragStart({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
-      });
-      setIsDragging(true);
-    }
-  }, [onClick]);
+    setDragStart({
+      x: e.clientX - position.x,
+      y: e.clientY - position.y
+    });
+    setIsDragging(true);
+  }, [onClick, position.x, position.y]);
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (isDragging) {
@@ -66,45 +69,47 @@ const Window = ({ title, children, onClose, isActive = true, onClick }: WindowPr
     <div 
       ref={windowRef}
       onClick={onClick}
+      className="window-container"
       style={{
-        background: 'radial-gradient(ellipse at top left, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.2) 100%)',
-        backdropFilter: 'blur(42px)',
-        border: '3.5px solid rgba(255, 255, 255, 0.3)',
+        background: windowStyles.background,
+        backdropFilter: windowStyles.backdropFilter,
+        border: windowStyles.border,
         borderRadius: '12px',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+        boxShadow: windowStyles.boxShadow,
         overflow: 'hidden',
         minWidth: '400px',
         position: 'absolute',
         left: position.x,
         top: position.y,
         cursor: isDragging ? 'grabbing' : 'default',
-        zIndex: isActive ? 1000 : 100,
-        transition: 'z-index 0.2s ease',
-        backgroundClip: 'padding-box'
+        zIndex: isActive ? 40 : 30,
+        transition: 'z-index 0.2s ease'
       }}
     >
       {/* Window Title Bar */}
       <div 
         onMouseDown={handleMouseDown}
         style={{
-          background: 'rgba(255, 255, 255, 0.1)',
-          backdropFilter: 'blur(15px)',
+          background: windowStyles.titleBar.background,
+          backdropFilter: 'blur(10px)',
           padding: '12px 16px',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           cursor: 'grab',
           userSelect: 'none',
-          borderTopLeftRadius: '8px',
-          borderTopRightRadius: '8px'
+          borderTopLeftRadius: '12px',
+          borderTopRightRadius: '12px',
+          borderBottom: windowStyles.titleBar.borderBottom
         }}
       >
         <div 
           style={{
             fontFamily: 'var(--font-family)',
-            fontSize: '14px',
-            fontWeight: '600',
-            color: 'rgba(0, 0, 0, 0.8)'
+            fontSize: '13px',
+            fontWeight: '500',
+            color: textStyles.windowTitle,
+            letterSpacing: '-0.01em'
           }}
         >
           {title}
@@ -112,45 +117,81 @@ const Window = ({ title, children, onClose, isActive = true, onClick }: WindowPr
         
         <div style={{ display: 'flex', gap: '8px' }}>
           {/* Minimize Button */}
-          <button
-            onClick={() => setIsMinimized(!isMinimized)}
-            style={{
-              width: '16px',
-              height: '16px',
-              borderRadius: '50%',
-              border: 'none',
-              backgroundColor: '#FFD700',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
-            <span style={{ fontSize: '10px', fontWeight: 'bold', color: '#000' }}>
-              {isMinimized ? '+' : '−'}
-            </span>
-          </button>
-          
-          {/* Close Button */}
-          {onClose && (
-            <button
-              onClick={onClose}
+                      <button
+              onClick={() => setIsMinimized(!isMinimized)}
               style={{
-                width: '16px',
-                height: '16px',
+                width: '12px',
+                height: '12px',
                 borderRadius: '50%',
                 border: 'none',
-                backgroundColor: '#FF5F5F',
+                background: '#FFBD2E',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#FFB000';
+                const span = e.currentTarget.querySelector('span');
+                if (span) span.style.opacity = '1';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = '#FFBD2E';
+                const span = e.currentTarget.querySelector('span');
+                if (span) span.style.opacity = '0';
               }}
             >
-              <span style={{ fontSize: '10px', fontWeight: 'bold', color: '#fff' }}>
-                ×
+              <span style={{ 
+                fontSize: '8px', 
+                fontWeight: '700', 
+                color: 'rgba(0, 0, 0, 0.7)',
+                fontFamily: 'var(--font-family)',
+                opacity: '0',
+                transition: 'opacity 0.2s ease'
+              }}>
+                {isMinimized ? '+' : '−'}
               </span>
             </button>
+          
+          {/* Close Button */}
+          {onClose && (
+                           <button
+                onClick={onClose}
+                style={{
+                  width: '12px',
+                  height: '12px',
+                  borderRadius: '50%',
+                  border: 'none',
+                  background: '#FF5F57',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#FF3B30';
+                  const span = e.currentTarget.querySelector('span');
+                  if (span) span.style.opacity = '1';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = '#FF5F57';
+                  const span = e.currentTarget.querySelector('span');
+                  if (span) span.style.opacity = '0';
+                }}
+             >
+                <span style={{ 
+                  fontSize: '8px', 
+                  fontWeight: '700', 
+                  color: 'rgba(0, 0, 0, 0.7)',
+                  fontFamily: 'var(--font-family)',
+                  opacity: '0',
+                  transition: 'opacity 0.2s ease'
+                }}>
+                  ×
+                </span>
+              </button>
           )}
         </div>
       </div>
@@ -160,9 +201,8 @@ const Window = ({ title, children, onClose, isActive = true, onClick }: WindowPr
         <div style={{ 
           padding: '24px',
           background: 'transparent',
-          backdropFilter: 'blur(10px)',
-          borderBottomLeftRadius: '8px',
-          borderBottomRightRadius: '8px'
+          borderBottomLeftRadius: '12px',
+          borderBottomRightRadius: '12px'
         }}>
           {children}
         </div>

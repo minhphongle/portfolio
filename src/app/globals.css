@@ -25,11 +25,12 @@
   --background: #ffffff;
   --foreground: #171717;
   --bg: #fffffa;
-  --text-title: #2160a7;
+  --text-title: #0040DD;
   --text-body: #34343b;
   --text-grey: rgba(52, 52, 59, 0.5);
-  --font-family: "Montserrat", sans-serif;
-  --second-family: "Playfair Display", serif;
+  --chat-placeholder: rgba(52, 52, 59, 0.5);
+  --font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --second-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 @theme inline {
@@ -58,6 +59,172 @@ html, body {
   width: 100%;
 }
 
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+  html, body {
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: relative;
+    height: auto;
+    min-height: 100vh;
+  }
+  
+  .hero-section {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    padding-top: 80px !important;
+    padding-bottom: 100px !important;
+  }
+  
+  .desktop-nav {
+    display: none !important;
+  }
+  
+  .mobile-nav {
+    display: block !important;
+  }
+  
+  /* Hide left sidebar on mobile */
+  .left-sidebar {
+    display: none !important;
+  }
+  
+  .bgm-player {
+    top: 10px !important;
+    right: 10px !important;
+    padding: 8px 12px !important;
+    gap: 8px !important;
+  }
+  
+  .bgm-player input[type="range"] {
+    width: 60px !important;
+  }
+  
+  /* Window containers */
+  .window-container {
+    position: relative !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    min-width: auto !important;
+    max-width: 100% !important;
+    margin-bottom: 20px !important;
+    transform: none !important;
+  }
+  
+  /* Chat bar */
+  .chat-bar-container {
+    bottom: 90px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: calc(100% - 20px) !important;
+    max-width: calc(100% - 20px) !important;
+  }
+  
+  /* ChatBot dialog */
+  .chatbot-dialog {
+    bottom: 180px !important;
+    right: 10px !important;
+    left: 10px !important;
+    width: calc(100% - 20px) !important;
+    max-width: calc(100% - 20px) !important;
+    height: 300px !important;
+  }
+  
+  /* Window content adjustments */
+  .window-container .flex {
+    flex-direction: column !important;
+    gap: 20px !important;
+  }
+  
+  .window-container .flex > div {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  /* Image adjustments */
+  .window-container img {
+    width: 100% !important;
+    height: auto !important;
+    max-width: 200px !important;
+    align-self: center !important;
+  }
+  
+  /* Text size adjustments */
+  .window-container div[style*="fontSize"] {
+    font-size: clamp(16px, 4vw, 32px) !important;
+  }
+  
+  /* Mobile window stacking */
+  .mobile-window-stack {
+    position: fixed !important;
+    top: 90px !important;
+    left: 10px !important;
+    right: 10px !important;
+    bottom: 180px !important;
+    overflow-y: auto !important;
+    z-index: 100 !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  .mobile-window {
+    position: relative !important;
+    width: 100% !important;
+    min-height: auto !important;
+    max-height: none !important;
+    margin-bottom: 10px !important;
+  }
+  
+  /* Spotify and other windows - show in mobile stack */
+  .spotify-window,
+  .projects-window,
+  .experience-window,
+  .case-study-window {
+    position: relative !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    transform: none !important;
+    margin-bottom: 10px !important;
+    height: auto !important;
+    max-height: 500px !important;
+  }
+  
+  /* Mobile projects grid - single column */
+  .projects-window div[style*="grid-template-columns"] {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  
+  /* Mobile scrollbar styling */
+  .mobile-window-stack::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  .mobile-window-stack::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+  }
+  
+  .mobile-window-stack::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+  }
+}
+
+/* Desktop styles - hide mobile nav, show desktop nav */
+@media (min-width: 769px) {
+  .mobile-nav {
+    display: none !important;
+  }
+  
+  .desktop-nav {
+    display: block !important;
+  }
+}
+
 /* Frosted glass text effect */
 .frosted-text {
   text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
@@ -67,4 +234,53 @@ html, body {
 .glass-content {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+}
+
+/* Chat bar styles */
+.chat-textarea::-webkit-scrollbar {
+  display: none;
+}
+
+.chat-textarea {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* Custom scrollbar styles for windows */
+.projects-window ::-webkit-scrollbar,
+.case-study-window ::-webkit-scrollbar {
+  width: 6px;
+}
+
+.projects-window ::-webkit-scrollbar-track,
+.case-study-window ::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.projects-window ::-webkit-scrollbar-thumb,
+.case-study-window ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.projects-window ::-webkit-scrollbar-thumb:hover,
+.case-study-window ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.chat-textarea::placeholder {
+  color: var(--chat-placeholder);
+  opacity: 0.8;
+}
+
+@keyframes pulse {
+  0%, 60%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
 }

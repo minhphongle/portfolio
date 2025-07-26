@@ -2,6 +2,33 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import Image from 'next/image';
+import { useTheme } from '../../context/ThemeContext';
+
+// Function to parse content with embedded images
+const parseContent = (content: string) => {
+  // Split content by image markers like [IMAGE:/path/to/image.jpg]
+  const parts = content.split(/(\[IMAGE:[^\]]+\])/g);
+  
+  return parts.map((part, index) => {
+    // Check if this part is an image marker
+    const imageMatch = part.match(/\[IMAGE:([^\]]+)\]/);
+    if (imageMatch) {
+      const imagePath = imageMatch[1];
+      return {
+        type: 'image',
+        content: imagePath,
+        key: `image-${index}`
+      };
+    } else {
+      // Regular text content
+      return {
+        type: 'text',
+        content: part,
+        key: `text-${index}`
+      };
+    }
+  }).filter(item => item.content.trim() !== ''); // Remove empty parts
+};
 
 interface CaseStudyWindowProps {
   caseStudy: CaseStudy;
@@ -39,6 +66,10 @@ const CaseStudyWindow = ({
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const windowRef = useRef<HTMLDivElement>(null);
+  const { getWindowStyles, getTextStyles } = useTheme();
+  
+  const windowStyles = getWindowStyles();
+  const textStyles = getTextStyles();
 
   // Debug logging
   console.log('CaseStudyWindow props:', {
@@ -53,15 +84,12 @@ const CaseStudyWindow = ({
       onClick();
     }
     
-    if (windowRef.current) {
-      const rect = windowRef.current.getBoundingClientRect();
-      setDragStart({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
-      });
-      setIsDragging(true);
-    }
-  }, [onClick]);
+    setDragStart({
+      x: e.clientX - position.x,
+      y: e.clientY - position.y
+    });
+    setIsDragging(true);
+  }, [onClick, position.x, position.y]);
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (isDragging) {
@@ -96,49 +124,51 @@ const CaseStudyWindow = ({
       <div 
         ref={windowRef}
         onClick={onClick}
+        className="case-study-window"
         style={{
-          background: 'radial-gradient(ellipse at top left, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.2) 100%)',
-          backdropFilter: 'blur(42px)',
-          border: '3.5px solid rgba(255, 255, 255, 0.3)',
+          background: windowStyles.background,
+          backdropFilter: windowStyles.backdropFilter,
+          border: windowStyles.border,
           borderRadius: '12px',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-          overflow: 'visible', // Changed from 'hidden' to 'visible'
+          boxShadow: windowStyles.boxShadow,
+          overflow: 'hidden',
           width: isMinimized ? '320px' : '700px',
           height: isMinimized ? 'auto' : '600px',
           position: 'absolute',
           left: position.x,
           top: position.y,
           cursor: isDragging ? 'grabbing' : 'default',
-          zIndex: isActive ? 1000 : 100,
-          transition: 'z-index 0.2s ease',
-          backgroundClip: 'padding-box'
+          zIndex: isActive ? 40 : 30,
+          transition: 'z-index 0.2s ease'
         }}
       >
       {/* Window Title Bar */}
       <div 
         onMouseDown={handleMouseDown}
         style={{
-          background: 'rgba(255, 255, 255, 0.1)',
-          backdropFilter: 'blur(15px)',
+          background: windowStyles.titleBar.background,
+          backdropFilter: 'blur(10px)',
           padding: '12px 16px',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           cursor: 'grab',
           userSelect: 'none',
-          borderTopLeftRadius: '8px',
-          borderTopRightRadius: '8px'
+          borderTopLeftRadius: '12px',
+          borderTopRightRadius: '12px',
+          borderBottom: windowStyles.titleBar.borderBottom
         }}
       >
         <div 
           style={{
             fontFamily: 'var(--font-family)',
-            fontSize: '14px',
-            fontWeight: '600',
-            color: 'rgba(0, 0, 0, 0.8)'
+            fontSize: '13px',
+            fontWeight: '500',
+            color: textStyles.windowTitle,
+            letterSpacing: '-0.01em'
           }}
         >
-          {caseStudy.title}.md
+          {caseStudy.title}
         </div>
         
         <div style={{ display: 'flex', gap: '8px' }}>
@@ -146,18 +176,36 @@ const CaseStudyWindow = ({
           <button
             onClick={() => setIsMinimized(!isMinimized)}
             style={{
-              width: '16px',
-              height: '16px',
+              width: '12px',
+              height: '12px',
               borderRadius: '50%',
               border: 'none',
-              backgroundColor: '#FFD700',
+              background: '#FFBD2E',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center'
+              justifyContent: 'center',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = '#FFB000';
+              const span = e.currentTarget.querySelector('span');
+              if (span) span.style.opacity = '1';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = '#FFBD2E';
+              const span = e.currentTarget.querySelector('span');
+              if (span) span.style.opacity = '0';
             }}
           >
-            <span style={{ fontSize: '10px', fontWeight: 'bold', color: '#000' }}>
+            <span style={{ 
+              fontSize: '8px', 
+              fontWeight: '700', 
+              color: 'rgba(0, 0, 0, 0.7)',
+              fontFamily: 'var(--font-family)',
+              opacity: '0',
+              transition: 'opacity 0.2s ease'
+            }}>
               {isMinimized ? '+' : '−'}
             </span>
           </button>
@@ -167,18 +215,36 @@ const CaseStudyWindow = ({
             <button
               onClick={onClose}
               style={{
-                width: '16px',
-                height: '16px',
+                width: '12px',
+                height: '12px',
                 borderRadius: '50%',
                 border: 'none',
-                backgroundColor: '#FF5F5F',
+                background: '#FF5F57',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#FF3B30';
+                const span = e.currentTarget.querySelector('span');
+                if (span) span.style.opacity = '1';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = '#FF5F57';
+                const span = e.currentTarget.querySelector('span');
+                if (span) span.style.opacity = '0';
               }}
             >
-              <span style={{ fontSize: '10px', fontWeight: 'bold', color: '#fff' }}>
+              <span style={{ 
+                fontSize: '8px', 
+                fontWeight: '700', 
+                color: 'rgba(0, 0, 0, 0.7)',
+                fontFamily: 'var(--font-family)',
+                opacity: '0',
+                transition: 'opacity 0.2s ease'
+              }}>
                 ×
               </span>
             </button>
@@ -191,43 +257,29 @@ const CaseStudyWindow = ({
         <div style={{ 
           padding: '24px',
           background: 'transparent',
-          backdropFilter: 'blur(10px)',
-          borderBottomLeftRadius: '8px',
-          borderBottomRightRadius: '8px',
+          borderBottomLeftRadius: '12px',
+          borderBottomRightRadius: '12px',
           height: 'calc(100% - 60px)',
-          overflow: 'auto'
+          overflow: 'auto',
+          boxSizing: 'border-box',
+          width: '100%'
         }}>
           {/* Case Study Header */}
           <div style={{
             marginBottom: '24px'
           }}>
-            {/* Hero Image */}
-            <div style={{
-              width: '100%',
-              height: '200px',
-              borderRadius: '12px',
-              overflow: 'hidden',
-              marginBottom: '20px',
-              position: 'relative'
-            }}>
-              <Image
-                src={caseStudy.image}
-                alt={caseStudy.title}
-                fill
-                style={{
-                  objectFit: 'cover'
-                }}
-              />
-            </div>
-
             {/* Title and Tags */}
             <h1 style={{
               fontFamily: 'var(--font-family)',
               fontSize: '28px',
               fontWeight: '700',
-              color: 'var(--text-title)',
+              color: textStyles.title,
               margin: '0 0 12px 0',
-              lineHeight: '1.2'
+              lineHeight: '1.2',
+              wordWrap: 'break-word',
+              overflowWrap: 'break-word',
+              maxWidth: '100%',
+              textShadow: textStyles.title.includes('255') ? '0 1px 2px rgba(0, 0, 0, 0.3)' : 'none'
             }}>
               {caseStudy.title}
             </h1>
@@ -235,9 +287,13 @@ const CaseStudyWindow = ({
             <p style={{
               fontFamily: 'var(--font-family)',
               fontSize: '16px',
-              color: 'var(--text-body)',
+              color: textStyles.body,
               margin: '0 0 16px 0',
-              lineHeight: '1.5'
+              lineHeight: '1.5',
+              wordWrap: 'break-word',
+              overflowWrap: 'break-word',
+              maxWidth: '100%',
+              textShadow: textStyles.body.includes('255') ? '0 1px 2px rgba(0, 0, 0, 0.3)' : 'none'
             }}>
               {caseStudy.description}
             </p>
@@ -253,13 +309,15 @@ const CaseStudyWindow = ({
                 <span
                   key={index}
                   style={{
-                    background: 'rgba(33, 96, 167, 0.2)',
-                    color: 'var(--text-title)',
+                    background: textStyles.title.includes('255') ? 'rgba(100, 150, 255, 0.2)' : 'rgba(33, 96, 167, 0.2)',
+                    color: textStyles.title.includes('255') ? 'rgba(100, 150, 255, 0.9)' : 'var(--text-title)',
                     padding: '6px 12px',
                     borderRadius: '16px',
                     fontSize: '12px',
                     fontFamily: 'var(--font-family)',
-                    fontWeight: '500'
+                    fontWeight: '500',
+                    border: textStyles.title.includes('255') ? '0.5px solid rgba(100, 150, 255, 0.3)' : 'none',
+                    textShadow: textStyles.title.includes('255') ? '0 1px 2px rgba(0, 0, 0, 0.3)' : 'none'
                   }}
                 >
                   {tag}
@@ -274,18 +332,23 @@ const CaseStudyWindow = ({
               fontFamily: 'var(--font-family)',
               fontSize: '20px',
               fontWeight: '600',
-              color: 'var(--text-title)',
+              color: textStyles.title,
               margin: '0 0 16px 0',
-              lineHeight: '1.3'
+              lineHeight: '1.3',
+              textShadow: textStyles.title.includes('255') ? '0 1px 2px rgba(0, 0, 0, 0.3)' : 'none'
             }}>
               Background
             </h2>
             <p style={{
               fontFamily: 'var(--font-family)',
               fontSize: '14px',
-              color: 'var(--text-body)',
+              color: textStyles.body,
               margin: '0',
-              lineHeight: '1.6'
+              lineHeight: '1.6',
+              wordWrap: 'break-word',
+              overflowWrap: 'break-word',
+              maxWidth: '100%',
+              textShadow: textStyles.body.includes('255') ? '0 1px 2px rgba(0, 0, 0, 0.3)' : 'none'
             }}>
               {caseStudy.background}
             </p>
@@ -297,20 +360,63 @@ const CaseStudyWindow = ({
               fontFamily: 'var(--font-family)',
               fontSize: '20px',
               fontWeight: '600',
-              color: 'var(--text-title)',
+              color: textStyles.title,
               margin: '0 0 16px 0',
-              lineHeight: '1.3'
+              lineHeight: '1.3',
+              textShadow: textStyles.title.includes('255') ? '0 1px 2px rgba(0, 0, 0, 0.3)' : 'none'
             }}>
               Content
             </h2>
             <div style={{
               fontFamily: 'var(--font-family)',
               fontSize: '14px',
-              color: 'var(--text-body)',
+              color: textStyles.body,
               lineHeight: '1.6',
-              whiteSpace: 'pre-line'
+              wordWrap: 'break-word',
+              overflowWrap: 'break-word',
+              maxWidth: '100%',
+              textShadow: textStyles.body.includes('255') ? '0 1px 2px rgba(0, 0, 0, 0.3)' : 'none'
             }}>
-              {caseStudy.content}
+              {parseContent(caseStudy.content).map((item) => {
+                if (item.type === 'image') {
+                  return (
+                    <div
+                      key={item.key}
+                      style={{
+                        margin: '20px 0',
+                        borderRadius: '8px',
+                        overflow: 'hidden',
+                        position: 'relative',
+                        width: '100%',
+                        aspectRatio: '1.6'
+                      }}
+                    >
+                      <Image
+                        src={item.content}
+                        alt="Case study image"
+                        fill
+                        quality={100}
+                        priority={false}
+                        style={{
+                          objectFit: 'cover'
+                        }}
+                      />
+                    </div>
+                  );
+                } else {
+                  return (
+                    <div
+                      key={item.key}
+                      style={{
+                        whiteSpace: 'pre-line',
+                        marginBottom: item.content.trim().endsWith('\n\n') ? '0' : '16px'
+                      }}
+                    >
+                      {item.content}
+                    </div>
+                  );
+                }
+              })}
             </div>
           </div>
         </div>
@@ -341,7 +447,6 @@ const CaseStudyWindow = ({
                 alignItems: 'center',
                 justifyContent: 'center',
                 transition: 'all 0.3s ease',
-                backgroundClip: 'padding-box',
                 zIndex: isActive ? 1001 : 101
               }}
               onMouseEnter={(e) => {
@@ -385,7 +490,6 @@ const CaseStudyWindow = ({
                 alignItems: 'center',
                 justifyContent: 'center',
                 transition: 'all 0.3s ease',
-                backgroundClip: 'padding-box',
                 zIndex: isActive ? 1001 : 101
               }}
               onMouseEnter={(e) => {

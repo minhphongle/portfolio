@@ -1,11 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useTheme } from '../context/ThemeContext';
 import Window from '@/components/ui/Window';
 import SpotifyWindow from '@/components/ui/SpotifyWindow';
+import ChatBar from '@/components/ui/ChatBar';
+import ChatBot from '@/components/ui/ChatBot';
 import ProjectsWindow from '@/components/ui/ProjectsWindow';
 import CaseStudyWindow from '@/components/ui/CaseStudyWindow';
+import ExperienceWindow from '@/components/ui/ExperienceWindow';
+import Navigation from '@/components/layout/Navigation';
+import BGMPlayer from '@/components/ui/BGMPlayer';
+import LeftSidebar from '@/components/ui/LeftSidebar';
 
 interface Project {
   id: string;
@@ -18,58 +25,182 @@ interface Project {
 }
 
 export default function Home() {
-  const [showSpotify, setShowSpotify] = useState(true);
-  const [showProjects, setShowProjects] = useState(true);
+  const [showSpotify, setShowSpotify] = useState(false);
+  const [showProjects, setShowProjects] = useState(false);
+  const [showExperience, setShowExperience] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
   const [selectedCaseStudy, setSelectedCaseStudy] = useState<Project | null>(null);
-  const [activeWindow, setActiveWindow] = useState<'intro' | 'spotify' | 'projects' | 'casestudy'>('intro');
+  const [activeWindow, setActiveWindow] = useState<'intro' | 'spotify' | 'projects' | 'casestudy' | 'experience'>('intro');
+  const [chatMessage, setChatMessage] = useState('');
+  const [showChatBot, setShowChatBot] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const { getTextStyles } = useTheme();
+  const textStyles = getTextStyles();
+
+  // Check if we're on mobile and set initial state
+  useEffect(() => {
+    const checkIsMobile = () => {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      
+      // Set initial window state based on device type
+      if (mobile) {
+        // Mobile: Show About by default
+        setShowAbout(true);
+        setShowSpotify(false);
+        setActiveWindow('intro');
+      } else {
+        // Desktop: Show both About and Spotify by default
+        setShowAbout(true);
+        setShowSpotify(true);
+        setActiveWindow('intro');
+      }
+    };
+    
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
+
+  const handleSendMessage = (message: string) => {
+    setChatMessage(message);
+    // Open chatbot when user sends a message
+    setShowChatBot(true);
+    console.log('Message sent:', message);
+  };
+
+  const handleChatBotToggle = () => {
+    setShowChatBot(!showChatBot);
+  };
+
+  const handleWindowToggle = (windowType: string) => {
+    if (isMobile) {
+      // Mobile: Only allow one window open at a time
+      setShowAbout(windowType === 'about');
+      setShowSpotify(windowType === 'playlist');
+      setShowProjects(windowType === 'projects');
+      setShowExperience(windowType === 'experience');
+      
+      switch (windowType) {
+        case 'about':
+          setActiveWindow('intro');
+          break;
+        case 'playlist':
+          setActiveWindow('spotify');
+          break;
+        case 'projects':
+          setActiveWindow('projects');
+          break;
+        case 'experience':
+          setActiveWindow('experience');
+          break;
+        default:
+          break;
+      }
+    } else {
+      // Desktop: Toggle windows individually (can have multiple open)
+      switch (windowType) {
+        case 'about':
+          setShowAbout(!showAbout);
+          if (!showAbout) setActiveWindow('intro');
+          break;
+        case 'playlist':
+          setShowSpotify(!showSpotify);
+          if (!showSpotify) setActiveWindow('spotify');
+          break;
+        case 'projects':
+          setShowProjects(!showProjects);
+          if (!showProjects) setActiveWindow('projects');
+          break;
+        case 'experience':
+          setShowExperience(!showExperience);
+          if (!showExperience) setActiveWindow('experience');
+          break;
+        default:
+          break;
+      }
+    }
+  };
 
   // Projects data (same as in ProjectsWindow)
   const projects: Project[] = [
     {
       id: '1',
-      title: 'Case Study 1',
-      description: 'Product Analytics Dashboard',
+      title: 'PSA International',
+      description: 'Systems Analyst - Logistics Enhancement',
       image: '/images/case1.png',
-      tags: ['Analytics', 'Dashboard', 'UX'],
-      background: 'This project was initiated to address the growing need for comprehensive product analytics in our SaaS platform. The existing reporting system was fragmented and difficult to navigate, leading to poor data-driven decision making across product teams.',
-      content: 'The solution involved designing and implementing a unified analytics dashboard that consolidated key metrics from multiple data sources. We focused on creating intuitive visualizations that would enable product managers to quickly identify trends and opportunities.\n\nKey features included:\n• Real-time data visualization\n• Customizable dashboard layouts\n• Advanced filtering and segmentation\n• Automated report generation\n• Mobile-responsive design\n\nThe result was a 40% improvement in decision-making speed and increased user engagement with analytics tools.'
+      tags: ['Angular', 'Spring Boot', 'CI/CD'],
+      background: 'TikTok LIVE creators face significant friction when managing payouts and understanding wallet features. Many creators struggle with unclear processes, delayed support responses, and complex navigation that impacts their earning experience and platform trust.',
+      content: 'I redesigned TikTok LIVE\'s Creator Wallet experience using AI-powered solutions to reduce friction and improve creator trust. The project focused on transforming static help systems into intelligent, context-aware assistance.\n\n[IMAGE:/images/case2.png]\n\nKey achievements:\n• Replaced static FAQ system with AI-powered chatbot that understands wallet context\n• Designed smart onboarding flow that adapts to creator experience level\n• Implemented proactive payout notifications and status updates\n• Created personalized wallet insights and earning optimization suggestions\n• Reduced creator support tickets by 45% through self-service improvements\n\n[IMAGE:/images/case3.png]\n\nThe redesigned experience significantly improved creator satisfaction and reduced platform friction, leading to increased creator retention and platform trust.'
     },
     {
       id: '2',
-      title: 'Case Study 2',
-      description: 'E-commerce Platform',
+      title: 'Shopee',
+      description: 'Product Operations - Search Optimization',
       image: '/images/case2.png',
-      tags: ['E-commerce', 'Strategy', 'Data'],
-      background: 'A mid-sized retail company approached us to redesign their e-commerce platform. Their existing solution had a high bounce rate and low conversion rates, particularly on mobile devices. Customer feedback indicated frustration with the checkout process and product discovery.',
-      content: 'We conducted extensive user research and competitive analysis to understand the pain points in the customer journey. The redesign focused on streamlining the user experience and optimizing for mobile-first interactions.\n\nKey improvements included:\n• Simplified navigation structure\n• One-page checkout process\n• Enhanced search and filtering\n• Personalized product recommendations\n• Improved page load speeds\n\nPost-launch metrics showed a 65% increase in conversion rates and a 45% reduction in cart abandonment.'
+      tags: ['Product Operations', 'Search', 'Analytics'],
+      background: 'In my Product Operations role at Shopee, I drove analytics projects focused on search optimization across multiple markets. The challenge was to improve search relevancy and conversion rates while managing complex product roadmaps.',
+      content: 'I led multiple analytics projects that directly impacted search performance and user experience across Shopee\'s platform.\n\nKey achievements:\n• Drove product roadmaps for 4 analytics projects enhancing search optimization\n• Achieved a 5% increase in conversion rates through search improvements\n• Conducted detailed analysis using precision and recall metrics to identify patterns\n• Improved search relevancy by 15% across 8 Southeast Asian markets\n• Wrote automation scripts for Product Operations Team, increasing efficiency by 30%\n• Collaborated with cross-functional teams to implement data-driven product decisions\n\nThe search optimization initiatives significantly enhanced user experience and contributed to measurable business growth across multiple markets.'
     },
     {
       id: '3',
-      title: 'Case Study 3',
-      description: 'Mobile App Design',
+      title: 'SPH Media',
+      description: 'Data Product Analyst - Cloud Migration',
       image: '/images/case3.png',
-      tags: ['Mobile', 'UI/UX', 'Product'],
-      background: 'A fitness startup needed a comprehensive mobile app to complement their wearable device. The app needed to sync with multiple fitness trackers, provide personalized workout plans, and create a social community around fitness goals.',
-      content: 'The design process involved extensive user interviews with fitness enthusiasts and collaboration with fitness experts to ensure accuracy and engagement. We prioritized ease of use while maintaining comprehensive functionality.\n\nCore features developed:\n• Multi-device synchronization\n• AI-powered workout recommendations\n• Social features and challenges\n• Progress tracking and analytics\n• Nutrition logging and guidance\n\nThe app launched with over 10,000 downloads in the first month and maintained a 4.8-star rating on app stores.'
+      tags: ['Tableau', 'Cloud Migration', 'Data Governance'],
+      background: 'As a Data Product Analyst at SPH Media, I led a comprehensive migration project from on-premise to cloud analytics infrastructure. The challenge was to modernize the data platform while ensuring business continuity and cost optimization.',
+      content: 'I spearheaded the end-to-end migration of SPH Media\'s analytics infrastructure to the cloud, transforming how the organization handles data and reporting.\n\nKey achievements:\n• Led complete migration of 1 Tableau Server to Tableau Cloud infrastructure\n• Achieved $12,000 USD monthly cost savings while improving platform scalability\n• Successfully migrated over 100 dashboards to cloud environment\n• Empowered 300+ users with enhanced self-service analytics capabilities\n• Implemented comprehensive governance protocols and access controls\n• Managed compliance across 2 Tableau Servers and 2 Tableau Cloud sites\n\nThe migration project significantly improved platform performance, reduced operational costs, and enabled better data democratization across the organization.'
     },
     {
       id: '4',
-      title: 'Case Study 4',
-      description: 'Data Visualization',
+      title: 'United Visual Researchers (Paris)',
+      description: 'Business Intelligence Engineer - RPA & Analytics',
       image: '/images/case4.png',
-      tags: ['Data Viz', 'Analytics', 'Strategy'],
-      background: 'A financial services company required an advanced data visualization platform to help their analysts identify market trends and risks. The existing tools were outdated and couldn\'t handle the volume and complexity of modern financial data.',
-      content: 'We developed a sophisticated visualization platform that could process large datasets in real-time and present complex financial information in an intuitive format. The solution needed to meet strict regulatory requirements while remaining user-friendly.\n\nTechnical achievements:\n• Real-time data processing\n• Interactive charting libraries\n• Customizable dashboard components\n• Advanced statistical analysis tools\n• Compliance-ready reporting features\n\nThe platform reduced analysis time by 60% and improved accuracy in risk assessment by 35%.'
+      tags: ['BI', 'RPA', 'Full-Stack'],
+      background: 'As a Business Intelligence Engineer at United Visual Researchers in Paris, I revolutionized the company\'s data strategy through full-stack development and automation. The challenge was to transform unstructured data into actionable insights while achieving significant cost savings.',
+      content: 'I designed and implemented comprehensive data solutions that transformed how the company handles business intelligence and regulatory reporting.\n\nKey achievements:\n• Revamped entire data strategy with full-stack reporting system for unstructured data\n• Achieved €2,000 monthly cost savings through automated data processing\n• Collaborated directly with CEO and CMO on requirements gathering\n• Created ad-hoc reports for government tax credit reclaiming, recovering €10,000+\n• Designed and implemented RPA solutions using Docker and n8n\n• Built analytics dashboards for C-suite executive decision-making\n• Reduced reporting time by 30% through automation and optimization\n\nThe comprehensive BI transformation enabled data-driven decision making at the executive level while delivering substantial cost savings and operational efficiency improvements.'
+    },
+    {
+      id: '5',
+      title: 'University Research',
+      description: 'HCI & User Behavior Study',
+      image: '/images/case1.png',
+      tags: ['Research', 'HCI', 'Academic'],
+      background: 'As part of my Information Systems studies at NUS, I conducted research on human-computer interaction patterns in mobile applications, focusing on how design elements influence user behavior and decision-making.',
+      content: 'The research involved designing and conducting controlled experiments to measure the impact of UI/UX design choices on user engagement and task completion rates.\n\nResearch methodology:\n• Designed experimental frameworks for A/B testing\n• Recruited and managed 200+ research participants\n• Used eye-tracking and behavioral analytics tools\n• Applied statistical analysis to validate findings\n• Published findings in academic conferences\n\nThe research contributed to understanding of mobile interface design principles and was recognized at the NUS School of Computing Research Showcase.'
+    },
+    {
+      id: '6',
+      title: 'Personal Project',
+      description: 'Portfolio Website',
+      image: '/images/case2.png',
+      tags: ['Web Dev', 'Design', 'Personal'],
+      background: 'Created this interactive portfolio website to showcase my work and technical skills. The challenge was to design a unique, memorable experience that reflects my personality while maintaining professional credibility.',
+      content: 'Designed and developed a Poolsuite.net-inspired glassmorphism portfolio with Apple-like aesthetics. The project involved both design and technical implementation challenges.\n\nTechnical features:\n• React/Next.js with TypeScript\n• Responsive design with mobile-first approach\n• Glassmorphism UI with light/dark themes\n• Draggable window components\n• Spotify integration and background music\n• AI chatbot for interactive resume queries\n\nThe portfolio demonstrates both technical skills and design sensibility, creating an engaging way for potential employers to learn about my background and experience.'
     }
   ];
 
   const handleProjectClick = (project: Project) => {
     setSelectedCaseStudy(project);
     setActiveWindow('casestudy');
+    
+    // On mobile, close other windows when opening case study
+    if (isMobile) {
+      setShowAbout(false);
+      setShowSpotify(false);
+      setShowProjects(false);
+      setShowExperience(false);
+    }
   };
 
   const handleCloseCaseStudy = () => {
     setSelectedCaseStudy(null);
+    
+    // On mobile, reopen the projects window when closing case study
+    if (isMobile) {
+      setShowProjects(true);
+      setActiveWindow('projects');
+    }
   };
 
   const handlePreviousCaseStudy = () => {
@@ -98,7 +229,7 @@ export default function Home() {
 
   return (
     <div style={{ 
-      backgroundImage: 'url(/images/bg.jpg)',
+      backgroundImage: 'url(/images/bg.gif)',
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       backgroundRepeat: 'no-repeat',
@@ -112,146 +243,376 @@ export default function Home() {
       left: 0
     }}>
       {/* Hero Section */}
-      <section style={{ 
-        background: 'rgba(255, 255, 250, 0.1)',
-        paddingLeft: '200px', 
-        paddingRight: '200px', 
-        height: '100vh' 
-      }}>
-                <div className="flex justify-center items-center" style={{ height: '100%' }}>
-          <Window 
-            title="about-minh-phong.exe"
-            isActive={activeWindow === 'intro'}
-            onClick={() => setActiveWindow('intro')}
-          >
-            {/* Horizontal autolayout with 60px gap - centered */}
-            <div className="flex items-center" style={{ gap: '60px' }}>
-              {/* Left Content - 320px width with 24px gaps */}
-              <div className="flex flex-col" style={{ width: '320px', maxWidth: '320px', gap: '24px' }}>
-                {/* Title Section - Equal gaps between all lines */}
-                <div className="flex flex-col" style={{ gap: '8px' }}>
-                  <div 
-                    style={{ 
-                      color: 'var(--text-title)',
-                      fontFamily: 'var(--font-family)',
-                      fontSize: '32px',
-                      lineHeight: '40px',
-                      fontWeight: 'normal'
-                    }}
-                  >
-                    hi, i'm <span 
-                      style={{ 
-                        fontFamily: 'var(--second-family)',
-                        fontSize: '32px',
-                        lineHeight: '40px',
-                        fontStyle: 'italic'
-                      }}
-                    >
-                      Minh Phong
-                    </span>
-                  </div>
-                  <div 
-                    style={{ 
-                      color: 'var(--text-title)',
-                      fontFamily: 'var(--font-family)',
-                      fontSize: '32px',
-                      lineHeight: '40px',
-                      fontWeight: 'normal'
-                    }}
-                  >
-                    a Product Analyst
-                  </div>
-                  <div 
-                    style={{ 
-                      color: 'var(--text-title)',
-                      fontFamily: 'var(--font-family)',
-                      fontSize: '32px',
-                      lineHeight: '40px',
-                      fontWeight: 'normal'
-                    }}
-                  >
-                    based in Singapore
-                  </div>
-                </div>
-                
-                {/* Job Seeking Text - Montserrat Bold */}
-                <div 
-                  style={{ 
-                    color: 'var(--text-body)',
-                    fontFamily: 'var(--font-family)',
-                    fontSize: '14px',
-                    lineHeight: '1.4',
-                    fontWeight: 'bold'
-                  }}
+      <section 
+        className="hero-section"
+        style={{ 
+          background: 'transparent',
+          paddingLeft: '200px', 
+          paddingRight: '200px', 
+          height: '100vh' 
+        }}
+      >
+        {isMobile ? (
+          /* Mobile: Stack windows vertically */
+          <div className="mobile-window-stack">
+            {showAbout && (
+              <div className="mobile-window">
+                <Window 
+                  title="About Minh Phong"
+                  isActive={activeWindow === 'intro'}
+                  onClick={() => setActiveWindow('intro')}
+                  onClose={() => setShowAbout(false)}
                 >
-                  Seeking full-time new grad opportunities in Product, Data, Strategy & Ops
-                </div>
-                
-                {/* Description Paragraph 1 - no margin */}
-                <div className="font-normal" style={{ color: 'var(--text-body)', fontSize: '13px', lineHeight: '1.4' }}>
-                  In my final semester as an ASEAN Scholar studying Information Systems @ NUS, 
-                  driven by a passion for HCI and building meaningful products. I chose this path to 
-                  learn about both tech and users.
-                </div>
-                
-                {/* Description Paragraph 2 - no margin */}
-                <div className="font-normal" style={{ color: 'var(--text-body)', fontSize: '13px', lineHeight: '1.4' }}>
-                  Previously interned @ PSA International, Shopee, and SPH Media. Also completed a 
-                  startup internship in Paris under the NUS Overseas Colleges (NOC) program :)
-                </div>
+                  {/* Mobile-optimized layout */}
+                  <div className="flex flex-col items-center" style={{ gap: '20px' }}>
+                    {/* Image first on mobile */}
+                    <div className="flex-shrink-0">
+                      <Image
+                        src="/images/my-photo.png"
+                        alt="Minh Phong"
+                        width={200}
+                        height={312}
+                        className="object-cover"
+                        style={{ borderRadius: '16px' }}
+                        priority
+                      />
+                    </div>
+                    
+                    {/* Content below image */}
+                    <div className="flex flex-col" style={{ gap: '16px', textAlign: 'center' }}>
+                      {/* Title Section */}
+                      <div className="flex flex-col" style={{ gap: '4px' }}>
+                        <div 
+                          style={{ 
+                            color: textStyles.title,
+                            fontFamily: 'var(--font-family)',
+                            fontSize: 'clamp(20px, 5vw, 24px)',
+                            lineHeight: '1.2',
+                            fontWeight: '600',
+                            letterSpacing: '-0.02em',
+                            textShadow: textStyles.title.includes('255') ? '0 1px 2px rgba(0, 0, 0, 0.3)' : 'none'
+                          }}
+                        >
+                          hi, i'm <span 
+                            style={{ 
+                              fontFamily: 'var(--font-family)',
+                              fontWeight: '700',
+                              color: textStyles.title.includes('255') ? 'rgba(100, 150, 255, 0.9)' : '#0040DD',
+                              textShadow: textStyles.title.includes('255') ? '0 1px 2px rgba(0, 0, 0, 0.3)' : 'none'
+                            }}
+                          >
+                            Minh Phong
+                          </span>
+                        </div>
+                        <div 
+                          style={{ 
+                            color: textStyles.title,
+                            fontFamily: 'var(--font-family)',
+                            fontSize: 'clamp(20px, 5vw, 24px)',
+                            lineHeight: '1.2',
+                            fontWeight: '600',
+                            letterSpacing: '-0.02em',
+                            textShadow: textStyles.title.includes('255') ? '0 1px 2px rgba(0, 0, 0, 0.3)' : 'none'
+                          }}
+                        >
+                          a Product Analyst based in Singapore
+                        </div>
+                      </div>
+                      
+                      {/* Job Seeking Text */}
+                      <div 
+                        style={{ 
+                          color: textStyles.body,
+                          fontFamily: 'var(--font-family)',
+                          fontSize: 'clamp(12px, 3.5vw, 14px)',
+                          lineHeight: '1.4',
+                          fontWeight: '600',
+                          letterSpacing: '-0.01em',
+                          textShadow: textStyles.body.includes('255') ? '0 1px 2px rgba(0, 0, 0, 0.3)' : 'none'
+                        }}
+                      >
+                        Seeking full-time new grad opportunities in Product, Data, Strategy & Ops
+                      </div>
+                      
+                      {/* Description */}
+                      <div style={{ 
+                        color: textStyles.body, 
+                        fontSize: 'clamp(11px, 3vw, 13px)', 
+                        lineHeight: '1.4', 
+                        fontWeight: '400', 
+                        letterSpacing: '-0.01em',
+                        textShadow: textStyles.body.includes('255') ? '0 1px 2px rgba(0, 0, 0, 0.3)' : 'none',
+                        textAlign: 'left'
+                      }}>
+                        In my final semester as an ASEAN Scholar studying Information Systems @ NUS, 
+                        driven by a passion for HCI and building meaningful products. I chose this path to 
+                        learn about both tech and users.
+                        <br/><br/>
+                        Previously interned @ PSA International, Shopee, and SPH Media. Also completed a 
+                        startup internship in Paris under the NUS Overseas Colleges (NOC) program :)
+                      </div>
+                    </div>
+                  </div>
+                </Window>
               </div>
-
-              {/* Right Image - 250x390 with 16px rounded corners */}
-              <div className="flex-shrink-0">
-                <Image
-                  src="/images/my-photo.png"
-                  alt="Minh Phong"
-                  width={250}
-                  height={390}
-                  className="object-cover"
-                  style={{ borderRadius: '16px' }}
-                  priority
+            )}
+            
+            {/* Spotify Window */}
+            {showSpotify && (
+              <div className="mobile-window">
+                <SpotifyWindow 
+                  playlistId="6w9nkHE6jGkM9Zx7t0kcRr"
+                  onClose={() => setShowSpotify(false)}
+                  isActive={activeWindow === 'spotify'}
+                  onClick={() => setActiveWindow('spotify')}
                 />
               </div>
+            )}
+
+            {/* Experience Window */}
+            {showExperience && (
+              <div className="mobile-window">
+                <ExperienceWindow 
+                  onClose={() => setShowExperience(false)}
+                  isActive={activeWindow === 'experience'}
+                  onClick={() => setActiveWindow('experience')}
+                />
+              </div>
+            )}
+            
+            {/* Projects Window */}
+            {showProjects && (
+              <div className="mobile-window">
+                <ProjectsWindow 
+                  onClose={() => setShowProjects(false)}
+                  isActive={activeWindow === 'projects'}
+                  onClick={() => setActiveWindow('projects')}
+                  onProjectClick={handleProjectClick}
+                />
+              </div>
+            )}
+            
+            {/* Case Study Window */}
+            {selectedCaseStudy && (
+              <div className="mobile-window">
+                <CaseStudyWindow 
+                  caseStudy={selectedCaseStudy}
+                  onClose={handleCloseCaseStudy}
+                  isActive={activeWindow === 'casestudy'}
+                  onClick={() => setActiveWindow('casestudy')}
+                  onPrevious={handlePreviousCaseStudy}
+                  onNext={handleNextCaseStudy}
+                  hasPrevious={hasPrevious}
+                  hasNext={hasNext}
+                />
+              </div>
+            )}
+          </div>
+        ) : (
+          /* Desktop: Positioned windows layout */
+          <div style={{ height: '100%', position: 'relative' }}>
+            {showAbout && (
+                <Window 
+                  title="About Minh Phong"
+                  isActive={activeWindow === 'intro'}
+                  onClick={() => setActiveWindow('intro')}
+                  onClose={() => setShowAbout(false)}
+                  initialPosition={{ x: 0, y: 180 }}
+                >
+                {/* Horizontal autolayout with 60px gap - centered */}
+                <div className="flex items-center" style={{ gap: '60px' }}>
+                  {/* Left Content - 320px width with 24px gaps */}
+                  <div className="flex flex-col" style={{ width: '320px', maxWidth: '320px', gap: '24px' }}>
+              {/* Title Section - Equal gaps between all lines */}
+              <div className="flex flex-col" style={{ gap: '8px' }}>
+                <div 
+                  style={{ 
+                          color: textStyles.title,
+                          fontFamily: 'var(--font-family)',
+                          fontSize: '32px',
+                          lineHeight: '40px',
+                          fontWeight: '600',
+                          letterSpacing: '-0.02em',
+                          textShadow: textStyles.title.includes('255') ? '0 1px 2px rgba(0, 0, 0, 0.3)' : 'none'
+                  }}
+                >
+                  hi, i'm <span 
+                    style={{ 
+                            fontFamily: 'var(--font-family)',
+                            fontSize: '32px',
+                            lineHeight: '40px',
+                            fontWeight: '700',
+                            letterSpacing: '-0.02em',
+                            color: textStyles.title.includes('255') ? 'rgba(100, 150, 255, 0.9)' : '#0040DD',
+                            textShadow: textStyles.title.includes('255') ? '0 1px 2px rgba(0, 0, 0, 0.3)' : 'none'
+                    }}
+                  >
+                    Minh Phong
+                  </span>
+                </div>
+                <div 
+                  style={{ 
+                          color: textStyles.title,
+                          fontFamily: 'var(--font-family)',
+                          fontSize: '32px',
+                          lineHeight: '40px',
+                          fontWeight: '600',
+                          letterSpacing: '-0.02em',
+                          textShadow: textStyles.title.includes('255') ? '0 1px 2px rgba(0, 0, 0, 0.3)' : 'none'
+                        }}
+                      >
+                        a Product Analyst
+                </div>
+                <div 
+                  style={{ 
+                          color: textStyles.title,
+                          fontFamily: 'var(--font-family)',
+                          fontSize: '32px',
+                          lineHeight: '40px',
+                          fontWeight: '600',
+                          letterSpacing: '-0.02em',
+                          textShadow: textStyles.title.includes('255') ? '0 1px 2px rgba(0, 0, 0, 0.3)' : 'none'
+                  }}
+                >
+                  based in Singapore
+                </div>
+              </div>
+              
+                    {/* Job Seeking Text */}
+              <div 
+                style={{ 
+                        color: textStyles.body,
+                        fontFamily: 'var(--font-family)',
+                        fontSize: '14px',
+                        lineHeight: '1.4',
+                        fontWeight: '600',
+                        letterSpacing: '-0.01em',
+                        textShadow: textStyles.body.includes('255') ? '0 1px 2px rgba(0, 0, 0, 0.3)' : 'none'
+                }}
+              >
+                Seeking full-time new grad opportunities in Product, Data, Strategy & Ops
+              </div>
+              
+                    {/* Description Paragraph 1 */}
+                    <div style={{ 
+                      color: textStyles.body, 
+                      fontSize: '13px', 
+                      lineHeight: '1.4', 
+                      fontWeight: '400', 
+                      letterSpacing: '-0.01em',
+                      textShadow: textStyles.body.includes('255') ? '0 1px 2px rgba(0, 0, 0, 0.3)' : 'none'
+                    }}>
+                In my final semester as an ASEAN Scholar studying Information Systems @ NUS, 
+                driven by a passion for HCI and building meaningful products. I chose this path to 
+                learn about both tech and users.
+              </div>
+              
+                    {/* Description Paragraph 2 */}
+                    <div style={{ 
+                      color: textStyles.body, 
+                      fontSize: '13px', 
+                      lineHeight: '1.4', 
+                      fontWeight: '400', 
+                      letterSpacing: '-0.01em',
+                      textShadow: textStyles.body.includes('255') ? '0 1px 2px rgba(0, 0, 0, 0.3)' : 'none'
+                    }}>
+                Previously interned @ PSA International, Shopee, and SPH Media. Also completed a 
+                startup internship in Paris under the NUS Overseas Colleges (NOC) program :)
+              </div>
             </div>
-          </Window>
-          
-          {/* Spotify Window */}
-          {showSpotify && (
-            <SpotifyWindow 
-              playlistId="6w9nkHE6jGkM9Zx7t0kcRr"
-              onClose={() => setShowSpotify(false)}
-              isActive={activeWindow === 'spotify'}
-              onClick={() => setActiveWindow('spotify')}
-            />
-          )}
-          
-          {/* Projects Window */}
-          {showProjects && (
-            <ProjectsWindow 
-              onClose={() => setShowProjects(false)}
-              isActive={activeWindow === 'projects'}
-              onClick={() => setActiveWindow('projects')}
-              onProjectClick={handleProjectClick}
-            />
-          )}
-          
-          {/* Case Study Window */}
-          {selectedCaseStudy && (
-            <CaseStudyWindow 
-              caseStudy={selectedCaseStudy}
-              onClose={handleCloseCaseStudy}
-              isActive={activeWindow === 'casestudy'}
-              onClick={() => setActiveWindow('casestudy')}
-              onPrevious={handlePreviousCaseStudy}
-              onNext={handleNextCaseStudy}
-              hasPrevious={hasPrevious}
-              hasNext={hasNext}
-            />
-          )}
-        </div>
+
+                  {/* Right Image - 250x390 with 16px rounded corners */}
+            <div className="flex-shrink-0">
+              <Image
+                src="/images/my-photo.png"
+                alt="Minh Phong"
+                      width={250}
+                      height={390}
+                className="object-cover"
+                      style={{ borderRadius: '16px' }}
+                priority
+              />
+                  </div>
+                </div>
+              </Window>
+            )}
+            
+            {/* Spotify Window */}
+            {showSpotify && (
+              <SpotifyWindow 
+                playlistId="6w9nkHE6jGkM9Zx7t0kcRr"
+                onClose={() => setShowSpotify(false)}
+                isActive={activeWindow === 'spotify'}
+                onClick={() => setActiveWindow('spotify')}
+              />
+            )}
+
+            {/* Experience Window */}
+            {showExperience && (
+              <ExperienceWindow 
+                onClose={() => setShowExperience(false)}
+                isActive={activeWindow === 'experience'}
+                onClick={() => setActiveWindow('experience')}
+              />
+            )}
+            
+            {/* Projects Window */}
+            {showProjects && (
+              <ProjectsWindow 
+                onClose={() => setShowProjects(false)}
+                isActive={activeWindow === 'projects'}
+                onClick={() => setActiveWindow('projects')}
+                onProjectClick={handleProjectClick}
+              />
+            )}
+            
+            {/* Case Study Window */}
+            {selectedCaseStudy && (
+              <CaseStudyWindow 
+                caseStudy={selectedCaseStudy}
+                onClose={handleCloseCaseStudy}
+                isActive={activeWindow === 'casestudy'}
+                onClick={() => setActiveWindow('casestudy')}
+                onPrevious={handlePreviousCaseStudy}
+                onNext={handleNextCaseStudy}
+                hasPrevious={hasPrevious}
+                hasNext={hasNext}
+              />
+            )}
+          </div>
+        )}
       </section>
 
+      {/* Left Sidebar - Desktop Only */}
+      <LeftSidebar />
+
+      {/* Navigation */}
+      <Navigation 
+        onWindowToggle={handleWindowToggle}
+        openWindows={{
+          about: showAbout,
+          experience: showExperience,
+          projects: showProjects,
+          playlist: showSpotify
+        }}
+      />
+
+      {/* Background Music Player */}
+      <BGMPlayer src="/bgm.mp3" autoPlay={true} />
+
+      {/* Chat Bar */}
+      <ChatBar 
+        onSendMessage={handleSendMessage}
+        placeholder="Ask anything about Minh Phong..."
+        onChatBotToggle={handleChatBotToggle}
+      />
+
+      {/* ChatBot */}
+      <ChatBot 
+        isVisible={showChatBot}
+        onClose={() => setShowChatBot(false)}
+        initialMessage={chatMessage}
+      />
 
     </div>
   );
