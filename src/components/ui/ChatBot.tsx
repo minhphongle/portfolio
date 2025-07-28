@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useTheme } from '../../context/ThemeContext';
 
 interface ChatMessage {
@@ -21,7 +21,7 @@ const ChatBot = ({ isVisible, onClose, initialMessage }: ChatBotProps) => {
     {
       id: '1',
       type: 'bot',
-      content: 'Hi! I\'m Minh Phong\'s assistant. Ask me about his experience, education, or about him! Try /help for available commands.',
+      content: 'Hi! I am Minh Phong assistant. Ask me about his experience, education, or about him! Try /help for available commands.',
       timestamp: new Date()
     }
   ]);
@@ -44,10 +44,11 @@ const ChatBot = ({ isVisible, onClose, initialMessage }: ChatBotProps) => {
     if (initialMessage && isVisible) {
       handleUserMessage(initialMessage);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialMessage, isVisible]);
 
   // Predefined responses based on resume/profile
-  const botResponses: { [key: string]: string } = {
+  const botResponses: { [key: string]: string } = useMemo(() => ({
     '/help': `Available commands:
 /experience - Work experience details
 /education - Educational background
@@ -95,7 +96,7 @@ const ChatBot = ({ isVisible, onClose, initialMessage }: ChatBotProps) => {
     
     '/about': `About Minh Phong:
 
-👋 Hi! I'm Minh Phong, a final-year Information Systems student at NUS with a passion for building meaningful products that bridge technology and user needs.
+👋 Hi! I am Minh Phong, a final-year Information Systems student at NUS with a passion for building meaningful products that bridge technology and user needs.
 
 🎯 What drives me:
 • Creating data-driven solutions that solve real business problems
@@ -111,9 +112,9 @@ const ChatBot = ({ isVisible, onClose, initialMessage }: ChatBotProps) => {
 Full-time opportunities in Product Management, Data Analytics, Strategy & Operations where I can leverage my technical skills and business acumen to drive meaningful impact.
 
 💡 Fun fact: I love exploring the intersection of technology and human behavior - it's what led me to specialize in HCI and product development!`
-  };
+  }), []);
 
-  const handleUserMessage = (userInput: string) => {
+  const handleUserMessage = useCallback((userInput: string) => {
     // Add user message
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
@@ -147,7 +148,7 @@ Full-time opportunities in Product Management, Data Analytics, Strategy & Operat
         botResponse = botResponses['/help'];
       }
       else {
-        botResponse = `I'm not sure about that. Try asking about my experience, education, or about me. Use /help for available commands.`;
+        botResponse = `I am not sure about that. Try asking about my experience, education, or about me. Use /help for available commands.`;
       }
 
       const botMessage: ChatMessage = {
@@ -159,7 +160,7 @@ Full-time opportunities in Product Management, Data Analytics, Strategy & Operat
 
       setMessages(prev => [...prev, botMessage]);
     }, 500 + Math.random() * 1000); // Simulate typing delay
-  };
+  }, [botResponses]);
 
   if (!isVisible) return null;
 
@@ -223,7 +224,7 @@ Full-time opportunities in Product Management, Data Analytics, Strategy & Operat
                 letterSpacing: '-0.01em'
               }}
             >
-              Minh Phong's Assistant
+              Minh Phong Assistant
             </div>
             <div
               style={{
@@ -343,7 +344,7 @@ Full-time opportunities in Product Management, Data Analytics, Strategy & Operat
             marginBottom: '8px'
           }}
         >
-          {['/experience', '/education', '/skills', '/projects'].map((command) => (
+          {['/experience', '/education'].map((command) => (
             <button
               key={command}
               onClick={() => handleUserMessage(command)}

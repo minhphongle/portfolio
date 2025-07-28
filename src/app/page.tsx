@@ -293,7 +293,7 @@ export default function Home() {
                             textShadow: textStyles.title.includes('255') ? '0 1px 2px rgba(0, 0, 0, 0.3)' : 'none'
                           }}
                         >
-                          hi, i'm <span 
+                          hi, i am <span 
                             style={{ 
                               fontFamily: 'var(--font-family)',
                               fontWeight: '700',
@@ -436,7 +436,7 @@ export default function Home() {
                           textShadow: textStyles.title.includes('255') ? '0 1px 2px rgba(0, 0, 0, 0.3)' : 'none'
                   }}
                 >
-                  hi, i'm <span 
+                  hi, i am <span 
                     style={{ 
                             fontFamily: 'var(--font-family)',
                             fontSize: '32px',

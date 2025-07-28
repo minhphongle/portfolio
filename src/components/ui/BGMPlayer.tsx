@@ -68,7 +68,7 @@ const BGMPlayer = ({ src, autoPlay = true }: BGMPlayerProps) => {
         tryAutoplay();
       }
     }
-  }, [autoPlay, volume]);
+  }, [autoPlay, volume, hasUserInteracted]);
 
   const tryAutoplay = async () => {
     const audio = audioRef.current;
@@ -81,7 +81,7 @@ const BGMPlayer = ({ src, autoPlay = true }: BGMPlayerProps) => {
           setIsPlaying(true);
           setCanAutoplay(true);
         }
-      } catch (error) {
+      } catch {
         // Autoplay blocked, will play on user interaction
         setIsPlaying(false);
         setCanAutoplay(false);

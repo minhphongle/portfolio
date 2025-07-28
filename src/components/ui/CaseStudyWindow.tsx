@@ -9,7 +9,7 @@ const parseContent = (content: string) => {
   // First, extract any iframe content and replace with placeholders
   const iframeRegex = /<iframe[^>]*>.*?<\/iframe>/gi;
   const iframes: string[] = [];
-  let processedContent = content.replace(iframeRegex, (match) => {
+  const processedContent = content.replace(iframeRegex, (match) => {
     iframes.push(match);
     return `[IFRAME:${iframes.length - 1}]`;
   });
