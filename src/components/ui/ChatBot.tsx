@@ -21,7 +21,7 @@ const ChatBot = ({ isVisible, onClose, initialMessage }: ChatBotProps) => {
     {
       id: '1',
       type: 'bot',
-      content: 'Hi! I\'m Minh Phong\'s assistant. Ask me anything about him! Try /help for available commands.',
+      content: 'Hi! I\'m Minh Phong\'s assistant. Ask me about his experience, education, or about him! Try /help for available commands.',
       timestamp: new Date()
     }
   ]);
@@ -49,51 +49,68 @@ const ChatBot = ({ isVisible, onClose, initialMessage }: ChatBotProps) => {
   // Predefined responses based on resume/profile
   const botResponses: { [key: string]: string } = {
     '/help': `Available commands:
-/start - Start conversation
-/experience - Work experience
+/experience - Work experience details
 /education - Educational background
-/skills - Technical skills
-/projects - Recent projects
-/contact - Contact information
-/location - Current location
-/about - About me`,
+/about - About Minh Phong`,
     
-    '/start': 'Hello! I\'m here to help you learn more about Minh Phong. What would you like to know?',
+    '/experience': `Work Experience:
+
+🏢 Systems Analyst - PSA International (May 2025 - Present)
+• Improved logistics apps with 6+ feature enhancements and 15+ bug fixes using Angular, Spring Boot, and Oracle DB
+• Led end-to-end UAT with enterprise clients, achieving 95% first-pass approval
+• Accelerated release cycles by 40% through optimized CI/CD pipelines with Concourse and Tanzu Apps Manager
+
+🚀 Business Intelligence Engineer - United Visual Researchers, Paris (Aug 2024 - Jan 2025)
+• Revamped data strategy and developed full-stack reporting system, achieving €2,000 monthly cost savings
+• Created ad-hoc reports for tax credit reclaiming, resulting in over €10,000 in recovered tax credits
+• Designed RPA solutions with Docker/n8n and analytics dashboards, cutting reporting time by 30%
+
+📊 Data Product Analyst - SPH Media (May 2024 - Aug 2024)
+• Led end-to-end migration of Tableau Server to Cloud, achieving $12,000 USD monthly cost saving
+• Enhanced user experience by migrating 100+ dashboards, empowering 300 users with self-service analytics
+• Implemented governance protocols and managed access controls for compliance
+
+🛒 Product Operations - Shopee (May 2023 - Aug 2023)
+• Drove product roadmaps for 4 analytics projects, achieving 5% increase in conversion rates
+• Conducted precision/recall analysis improving search relevancy by 15% across 8 markets
+• Automated tasks for Product Operations Team, leading to 30% efficiency increase`,
     
-    '/experience': `Minh Phong's work experience:
-• PSA International - Product Analyst Intern
-• Shopee - Data Analytics Intern  
-• SPH Media - Business Intelligence Intern
-• Startup experience in Paris through NUS Overseas Colleges (NOC)`,
-    
-    '/education': `Education:
-• National University of Singapore (NUS)
-• Information Systems Major
+    '/education': `Educational Background:
+
+🎓 National University of Singapore (NUS)
+• Bachelor of Computing (Information Systems)
 • ASEAN Scholar
-• Currently in final semester`,
-    
-    '/skills': `Technical Skills:
-• Product Analytics & Data Analysis
+• Final semester (Graduating 2025)
+
+📚 Key Areas of Study:
+• Human-Computer Interaction (HCI)
+• Product Analytics & Data Science
 • Business Intelligence
-• HCI (Human-Computer Interaction)
-• Product Strategy & Operations
-• Data Visualization`,
-    
-    '/projects': `Recent Projects:
-• Product Analytics Dashboard
-• E-commerce Platform Optimization
-• Mobile App UX Design
-• Data Visualization Platform`,
-    
-    '/contact': `Contact Information:
-• Email: Available upon request
-• LinkedIn: Connect through portfolio
-• Location: Singapore`,
-    
-    '/location': 'Minh Phong is currently based in Singapore 🇸🇬',
+• Systems Analysis & Design
+• Software Engineering
+
+🌍 International Experience:
+• NUS Overseas Colleges (NOC) Program in Paris
+• Cross-cultural business experience in European startup ecosystem`,
     
     '/about': `About Minh Phong:
-Final year Information Systems student at NUS, passionate about HCI and building meaningful products. ASEAN Scholar with international experience through internships in Singapore and Paris. Seeking full-time opportunities in Product, Data, Strategy & Operations.`
+
+👋 Hi! I'm Minh Phong, a final-year Information Systems student at NUS with a passion for building meaningful products that bridge technology and user needs.
+
+🎯 What drives me:
+• Creating data-driven solutions that solve real business problems
+• Designing intuitive user experiences through HCI principles
+• Building products that make a positive impact
+
+🌟 Background:
+• ASEAN Scholar at National University of Singapore
+• International experience through internships in Singapore and Paris
+• Strong foundation in product analytics, business intelligence, and systems development
+
+🚀 Currently seeking:
+Full-time opportunities in Product Management, Data Analytics, Strategy & Operations where I can leverage my technical skills and business acumen to drive meaningful impact.
+
+💡 Fun fact: I love exploring the intersection of technology and human behavior - it's what led me to specialize in HCI and product development!`
   };
 
   const handleUserMessage = (userInput: string) => {
@@ -117,29 +134,20 @@ Final year Information Systems student at NUS, passionate about HCI and building
         botResponse = botResponses[input];
       }
       // Check for keyword matches
-      else if (input.includes('experience') || input.includes('work') || input.includes('job')) {
+      else if (input.includes('experience') || input.includes('work') || input.includes('job') || input.includes('career')) {
         botResponse = botResponses['/experience'];
       }
-      else if (input.includes('education') || input.includes('study') || input.includes('university') || input.includes('nus')) {
+      else if (input.includes('education') || input.includes('study') || input.includes('university') || input.includes('nus') || input.includes('school') || input.includes('degree')) {
         botResponse = botResponses['/education'];
       }
-      else if (input.includes('skill') || input.includes('technical') || input.includes('technology')) {
-        botResponse = botResponses['/skills'];
-      }
-      else if (input.includes('project') || input.includes('portfolio') || input.includes('work')) {
-        botResponse = botResponses['/projects'];
-      }
-      else if (input.includes('contact') || input.includes('email') || input.includes('reach')) {
-        botResponse = botResponses['/contact'];
-      }
-      else if (input.includes('location') || input.includes('where') || input.includes('singapore')) {
-        botResponse = botResponses['/location'];
-      }
-      else if (input.includes('about') || input.includes('who') || input.includes('tell me')) {
+      else if (input.includes('about') || input.includes('who') || input.includes('tell me') || input.includes('background') || input.includes('intro')) {
         botResponse = botResponses['/about'];
       }
+      else if (input.includes('help') || input.includes('command') || input.includes('what can')) {
+        botResponse = botResponses['/help'];
+      }
       else {
-        botResponse = `I'm not sure about that. Try asking about my experience, education, skills, projects, or use /help for available commands.`;
+        botResponse = `I'm not sure about that. Try asking about my experience, education, or about me. Use /help for available commands.`;
       }
 
       const botMessage: ChatMessage = {

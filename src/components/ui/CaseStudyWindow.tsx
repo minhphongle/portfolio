@@ -4,10 +4,18 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import Image from 'next/image';
 import { useTheme } from '../../context/ThemeContext';
 
-// Function to parse content with embedded images
+// Function to parse content with embedded images and iframes
 const parseContent = (content: string) => {
-  // Split content by image markers like [IMAGE:/path/to/image.jpg]
-  const parts = content.split(/(\[IMAGE:[^\]]+\])/g);
+  // First, extract any iframe content and replace with placeholders
+  const iframeRegex = /<iframe[^>]*>.*?<\/iframe>/gi;
+  const iframes: string[] = [];
+  let processedContent = content.replace(iframeRegex, (match) => {
+    iframes.push(match);
+    return `[IFRAME:${iframes.length - 1}]`;
+  });
+  
+  // Split content by image markers and iframe markers
+  const parts = processedContent.split(/(\[(?:IMAGE|IFRAME):[^\]]+\])/g);
   
   return parts.map((part, index) => {
     // Check if this part is an image marker
@@ -18,6 +26,17 @@ const parseContent = (content: string) => {
         type: 'image',
         content: imagePath,
         key: `image-${index}`
+      };
+    }
+    
+    // Check if this part is an iframe marker
+    const iframeMatch = part.match(/\[IFRAME:(\d+)\]/);
+    if (iframeMatch) {
+      const iframeIndex = parseInt(iframeMatch[1]);
+      return {
+        type: 'iframe',
+        content: iframes[iframeIndex],
+        key: `iframe-${index}`
       };
     } else {
       // Regular text content
@@ -384,11 +403,11 @@ const CaseStudyWindow = ({
                       key={item.key}
                       style={{
                         margin: '20px 0',
-                        borderRadius: '8px',
+                        borderRadius: '0px',
                         overflow: 'hidden',
                         position: 'relative',
                         width: '100%',
-                        aspectRatio: '1.6'
+                        aspectRatio: '1.778'
                       }}
                     >
                       <Image
@@ -403,6 +422,65 @@ const CaseStudyWindow = ({
                       />
                     </div>
                   );
+                } else if (item.type === 'iframe') {
+                  // Extract iframe attributes and create a responsive iframe
+                  const tempDiv = document.createElement('div');
+                  tempDiv.innerHTML = item.content;
+                  const iframe = tempDiv.querySelector('iframe');
+                  
+                  if (iframe) {
+                    // Extract src and other important attributes
+                    const src = iframe.getAttribute('src') || '';
+                    const title = iframe.getAttribute('title') || 'Embedded content';
+                    
+                    return (
+                      <div
+                        key={item.key}
+                        style={{
+                          margin: '20px 0',
+                          borderRadius: '8px',
+                          overflow: 'hidden',
+                          position: 'relative',
+                          width: '100%',
+                          aspectRatio: '1.778'
+                        }}
+                      >
+                        <iframe
+                          src={src}
+                          title={title}
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          referrerPolicy="strict-origin-when-cross-origin"
+                          allowFullScreen
+                          style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100%',
+                            border: 'none'
+                          }}
+                        />
+                      </div>
+                    );
+                  } else {
+                    // Fallback: render as HTML if no iframe found
+                    return (
+                      <div
+                        key={item.key}
+                        style={{
+                          margin: '20px 0',
+                          borderRadius: '8px',
+                          overflow: 'hidden',
+                          position: 'relative',
+                          width: '100%',
+                          aspectRatio: '1.778'
+                        }}
+                        dangerouslySetInnerHTML={{ __html: item.content }}
+                      />
+                    );
+                  }
+                  return null;
                 } else {
                   return (
                     <div
