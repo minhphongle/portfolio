@@ -31,11 +31,21 @@ export default function Home() {
   const [showAbout, setShowAbout] = useState(false);
   const [selectedCaseStudy, setSelectedCaseStudy] = useState<Project | null>(null);
   const [activeWindow, setActiveWindow] = useState<'intro' | 'spotify' | 'projects' | 'casestudy' | 'experience'>('intro');
+  const [caseStudyPriority, setCaseStudyPriority] = useState(false); // Track if case study should have top priority
   const [chatMessage, setChatMessage] = useState('');
   const [showChatBot, setShowChatBot] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [showDragHint, setShowDragHint] = useState(false);
   const { getTextStyles } = useTheme();
   const textStyles = getTextStyles();
+
+  // Helper function to set active window and reset case study priority if needed
+  const setActiveWindowAndResetPriority = (window: 'intro' | 'spotify' | 'projects' | 'casestudy' | 'experience') => {
+    setActiveWindow(window);
+    if (window !== 'casestudy') {
+      setCaseStudyPriority(false);
+    }
+  };
 
   // Check if we're on mobile and set initial state
   useEffect(() => {
@@ -61,6 +71,22 @@ export default function Home() {
     window.addEventListener('resize', checkIsMobile);
     return () => window.removeEventListener('resize', checkIsMobile);
   }, []);
+
+  // Show drag hint when first window opens on desktop
+  useEffect(() => {
+    if (!isMobile && (showAbout || showSpotify || showProjects || showExperience)) {
+      const hasSeenHint = localStorage.getItem('hasSeenDragHint');
+      if (!hasSeenHint) {
+        setShowDragHint(true);
+        localStorage.setItem('hasSeenDragHint', 'true');
+        
+        // Hide hint after 8 seconds
+        setTimeout(() => {
+          setShowDragHint(false);
+        }, 8000);
+      }
+    }
+  }, [isMobile, showAbout, showSpotify, showProjects, showExperience]);
 
   const handleSendMessage = (message: string) => {
     setChatMessage(message);
@@ -173,7 +199,7 @@ export default function Home() {
       id: '6',
       title: 'Policy Simulation App for Ride-hailing Industry',
       description: 'Built an SAP-powered tool to simulate gig labor policies across ASEAN; analyzed CPF, insurance, and tax impacts; aligned with UN SDGs and regional stakeholder needs.',
-      image: '/images/un.svg',
+      image: '/images/UN.svg',
       tags: ['Product Analysis', 'Design', 'Policy Research'],
       background: 'This project was created during a regional policy innovation initiative focused on the future of gig work. Our team aimed to address regulatory challenges in the ride-hailing sector by designing a tool that enables policymakers to visualize the impact of different labor policies across ASEAN countries, with a special focus on Singapore and Vietnam.',
       content: 'We built a Policy Simulation App powered by SAP technologies to model the effects of introducing CPF contributions, accident insurance, and tax schemes for platform workers. The tool integrated real-world data and supported scenario testing, helping stakeholders assess trade-offs across economic, social, and regulatory dimensions. The framework was designed to align with UN Sustainable Development Goals and regional development goals. You can view the slides and materials below. \n\n[PDF:/images/UN.pdf]'
@@ -183,6 +209,7 @@ export default function Home() {
   const handleProjectClick = (project: Project) => {
     setSelectedCaseStudy(project);
     setActiveWindow('casestudy');
+    setCaseStudyPriority(true); // Set high priority when opened from project
     
     // On mobile, close other windows when opening case study
     if (isMobile) {
@@ -195,6 +222,7 @@ export default function Home() {
 
   const handleCloseCaseStudy = () => {
     setSelectedCaseStudy(null);
+    setCaseStudyPriority(false); // Reset priority when closed
     
     // On mobile, reopen the projects window when closing case study
     if (isMobile) {
@@ -235,10 +263,11 @@ export default function Home() {
       backgroundRepeat: 'no-repeat',
       backgroundAttachment: 'fixed',
       color: 'var(--text-body)', 
-      height: '100vh', 
+      minHeight: '100vh', 
       width: '100vw',
-      overflow: 'hidden',
-      position: 'fixed',
+      overflow: 'auto',
+      position: 'relative',
+      paddingBottom: '200px', // Add extra space at bottom for windows
       top: 0,
       left: 0
     }}>
@@ -249,7 +278,7 @@ export default function Home() {
           background: 'transparent',
           paddingLeft: '200px', 
           paddingRight: '200px', 
-          height: '100vh' 
+          minHeight: '100vh' 
         }}
       >
         {isMobile ? (
@@ -404,6 +433,7 @@ export default function Home() {
                   onNext={handleNextCaseStudy}
                   hasPrevious={hasPrevious}
                   hasNext={hasNext}
+                  hasTopPriority={caseStudyPriority}
                 />
               </div>
             )}
@@ -417,7 +447,7 @@ export default function Home() {
                   isActive={activeWindow === 'intro'}
                   onClick={() => setActiveWindow('intro')}
                   onClose={() => setShowAbout(false)}
-                  initialPosition={{ x: 0, y: 180 }}
+                  initialPosition={{ x: 100, y: 180 }}
                 >
                 {/* Horizontal autolayout with 60px gap - centered */}
                 <div className="flex items-center" style={{ gap: '60px' }}>
@@ -543,7 +573,7 @@ export default function Home() {
                 playlistId="6w9nkHE6jGkM9Zx7t0kcRr"
                 onClose={() => setShowSpotify(false)}
                 isActive={activeWindow === 'spotify'}
-                onClick={() => setActiveWindow('spotify')}
+                onClick={() => setActiveWindowAndResetPriority('spotify')}
               />
             )}
 
@@ -552,7 +582,7 @@ export default function Home() {
               <ExperienceWindow 
                 onClose={() => setShowExperience(false)}
                 isActive={activeWindow === 'experience'}
-                onClick={() => setActiveWindow('experience')}
+                onClick={() => setActiveWindowAndResetPriority('experience')}
               />
             )}
             
@@ -561,7 +591,7 @@ export default function Home() {
               <ProjectsWindow 
                 onClose={() => setShowProjects(false)}
                 isActive={activeWindow === 'projects'}
-                onClick={() => setActiveWindow('projects')}
+                onClick={() => setActiveWindowAndResetPriority('projects')}
                 onProjectClick={handleProjectClick}
               />
             )}
@@ -577,6 +607,7 @@ export default function Home() {
                 onNext={handleNextCaseStudy}
                 hasPrevious={hasPrevious}
                 hasNext={hasNext}
+                hasTopPriority={caseStudyPriority}
               />
             )}
           </div>
@@ -613,6 +644,79 @@ export default function Home() {
         onClose={() => setShowChatBot(false)}
         initialMessage={chatMessage}
       />
+
+      {/* Drag Hint Notification */}
+      {showDragHint && !isMobile && (
+        <div
+          style={{
+            position: 'fixed',
+            top: '20px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: 'rgba(0, 0, 0, 0.85)',
+            backdropFilter: 'blur(20px)',
+            border: '0.5px solid rgba(255, 255, 255, 0.2)',
+            borderRadius: '24px',
+            padding: '12px 20px',
+            color: 'white',
+            fontSize: '14px',
+            fontFamily: 'var(--font-family)',
+            fontWeight: '500',
+            zIndex: 1002,
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+            animation: 'dragHintFadeIn 0.5s ease-out',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            whiteSpace: 'nowrap'
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              gap: '2px',
+              opacity: 0.8
+            }}
+          >
+            <div style={{
+              width: '4px',
+              height: '4px',
+              borderRadius: '50%',
+              background: 'white',
+              animation: 'pulse 1.5s ease-in-out infinite'
+            }} />
+            <div style={{
+              width: '4px',
+              height: '4px',
+              borderRadius: '50%',
+              background: 'white',
+              animation: 'pulse 1.5s ease-in-out infinite 0.2s'
+            }} />
+            <div style={{
+              width: '4px',
+              height: '4px',
+              borderRadius: '50%',
+              background: 'white',
+              animation: 'pulse 1.5s ease-in-out infinite 0.4s'
+            }} />
+          </div>
+          <span>You can drag windows around to rearrange them!</span>
+          <button
+            onClick={() => setShowDragHint(false)}
+            style={{
+              background: 'rgba(255, 255, 255, 0.2)',
+              border: 'none',
+              borderRadius: '12px',
+              color: 'white',
+              cursor: 'pointer',
+              fontSize: '12px',
+              padding: '4px 8px'
+            }}
+          >
+            Got it
+          </button>
+        </div>
+      )}
 
     </div>
   );

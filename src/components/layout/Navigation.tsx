@@ -16,9 +16,12 @@ interface NavigationProps {
 const Navigation = ({ onWindowToggle, openWindows }: NavigationProps) => {
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { theme, toggleTheme } = useTheme();
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const burgerButtonRef = useRef<HTMLButtonElement>(null);
+  const { getWindowStyles, getTextStyles } = useTheme();
+  
+  const windowStyles = getWindowStyles();
+  const textStyles = getTextStyles();
 
   // Close mobile menu when clicking outside
   useEffect(() => {
@@ -46,8 +49,7 @@ const Navigation = ({ onWindowToggle, openWindows }: NavigationProps) => {
     { id: 'projects', label: 'Case Study', icon: 'folder' },
     { id: 'resume', label: 'Download Resume', icon: 'download' },
     { id: 'linkedin', label: 'LinkedIn', icon: 'linkedin' },
-    { id: 'playlist', label: 'My Playlist', icon: 'music' },
-    { id: 'theme', label: `Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`, icon: theme === 'light' ? 'moon' : 'sun' }
+    { id: 'playlist', label: 'My Playlist', icon: 'music' }
   ];
 
   const getIcon = (iconName: string) => {
@@ -107,26 +109,6 @@ const Navigation = ({ onWindowToggle, openWindows }: NavigationProps) => {
             <circle cx="18" cy="16" r="3" />
           </svg>
         );
-      case 'moon':
-        return (
-          <svg {...iconProps}>
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-          </svg>
-        );
-      case 'sun':
-        return (
-          <svg {...iconProps}>
-            <circle cx="12" cy="12" r="5" />
-            <line x1="12" y1="1" x2="12" y2="3" />
-            <line x1="12" y1="21" x2="12" y2="23" />
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-            <line x1="1" y1="12" x2="3" y2="12" />
-            <line x1="21" y1="12" x2="23" y2="12" />
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-          </svg>
-        );
       default:
         return null;
     }
@@ -155,9 +137,6 @@ const Navigation = ({ onWindowToggle, openWindows }: NavigationProps) => {
       case 'playlist':
         onWindowToggle(itemId);
         break;
-      case 'theme':
-        toggleTheme();
-        break;
       default:
         break;
     }
@@ -180,12 +159,12 @@ const Navigation = ({ onWindowToggle, openWindows }: NavigationProps) => {
           className="flex flex-col"
           style={{
             gap: '8px',
-            background: 'rgba(255, 255, 255, 0.1)',
-            backdropFilter: 'blur(20px)',
-            border: '0.5px solid rgba(255, 255, 255, 0.2)',
+            background: windowStyles.background,
+            backdropFilter: windowStyles.backdropFilter,
+            border: windowStyles.border,
             borderRadius: '24px',
             padding: '8px',
-            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08), 0 0 0 0.5px rgba(255, 255, 255, 0.1) inset'
+            boxShadow: windowStyles.boxShadow
           }}
         >
           {navItems.map((item) => (
@@ -201,8 +180,8 @@ const Navigation = ({ onWindowToggle, openWindows }: NavigationProps) => {
                   width: '48px',
                   height: '48px',
                   fontFamily: 'var(--font-family)',
-                  color: (openWindows && openWindows[item.id as keyof typeof openWindows]) ? 'var(--text-body)' : 'var(--text-grey)',
-                  backgroundColor: (openWindows && openWindows[item.id as keyof typeof openWindows]) ? 'rgba(0, 64, 221, 0.1)' : 'transparent',
+                  color: (openWindows && openWindows[item.id as keyof typeof openWindows]) ? textStyles.title : textStyles.body,
+                  backgroundColor: (openWindows && openWindows[item.id as keyof typeof openWindows]) ? windowStyles.card.hoverBackground : 'transparent',
                   border: 'none',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
@@ -223,16 +202,17 @@ const Navigation = ({ onWindowToggle, openWindows }: NavigationProps) => {
                     right: '60px',
                     top: '50%',
                     transform: 'translateY(-50%)',
-                    background: 'rgba(0, 0, 0, 0.8)',
-                    color: 'white',
+                    background: windowStyles.card.background,
+                    color: textStyles.body,
                     padding: '8px 12px',
                     borderRadius: '8px',
                     fontSize: '12px',
                     fontFamily: 'var(--font-family)',
                     whiteSpace: 'nowrap',
                     zIndex: 1000,
-                    backdropFilter: 'blur(10px)',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+                    backdropFilter: windowStyles.backdropFilter,
+                    border: windowStyles.card.border,
+                    boxShadow: windowStyles.boxShadow
                   }}
                 >
                   {item.label}
@@ -247,7 +227,7 @@ const Navigation = ({ onWindowToggle, openWindows }: NavigationProps) => {
                       height: '0',
                       borderTop: '4px solid transparent',
                       borderBottom: '4px solid transparent',
-                      borderLeft: '4px solid rgba(0, 0, 0, 0.8)'
+                      borderLeft: `4px solid ${windowStyles.card.background.includes('rgba') ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.8)'}`
                     }}
                   />
                 </div>
@@ -273,9 +253,9 @@ const Navigation = ({ onWindowToggle, openWindows }: NavigationProps) => {
             height: '56px',
             borderRadius: '28px',
             border: 'none',
-            background: 'rgba(255, 255, 255, 0.1)',
-            backdropFilter: 'blur(20px)',
-            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08), 0 0 0 0.5px rgba(255, 255, 255, 0.1) inset',
+            background: windowStyles.background,
+            backdropFilter: windowStyles.backdropFilter,
+            boxShadow: windowStyles.boxShadow,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -297,7 +277,7 @@ const Navigation = ({ onWindowToggle, openWindows }: NavigationProps) => {
               style={{
                 width: '100%',
                 height: '2px',
-                background: 'var(--text-body)',
+                background: textStyles.body,
                 borderRadius: '1px',
                 transform: isMobileMenuOpen ? 'rotate(45deg) translate(6px, 6px)' : 'none',
                 transition: 'all 0.3s ease'
@@ -307,7 +287,7 @@ const Navigation = ({ onWindowToggle, openWindows }: NavigationProps) => {
               style={{
                 width: '100%',
                 height: '2px',
-                background: 'var(--text-body)',
+                background: textStyles.body,
                 borderRadius: '1px',
                 opacity: isMobileMenuOpen ? 0 : 1,
                 transition: 'all 0.3s ease'
@@ -317,7 +297,7 @@ const Navigation = ({ onWindowToggle, openWindows }: NavigationProps) => {
               style={{
                 width: '100%',
                 height: '2px',
-                background: 'var(--text-body)',
+                background: textStyles.body,
                 borderRadius: '1px',
                 transform: isMobileMenuOpen ? 'rotate(-45deg) translate(8px, -8px)' : 'none',
                 transition: 'all 0.3s ease'
@@ -336,12 +316,12 @@ const Navigation = ({ onWindowToggle, openWindows }: NavigationProps) => {
                top: '90px',
                left: '20px',
                zIndex: 1000,
-              background: 'rgba(255, 255, 255, 0.1)',
-              backdropFilter: 'blur(20px)',
-              border: '0.5px solid rgba(255, 255, 255, 0.2)',
+              background: windowStyles.background,
+              backdropFilter: windowStyles.backdropFilter,
+              border: windowStyles.border,
               borderRadius: '16px',
               padding: '16px',
-              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08), 0 0 0 0.5px rgba(255, 255, 255, 0.1) inset',
+              boxShadow: windowStyles.boxShadow,
               display: 'flex',
               flexDirection: 'column',
               gap: '12px',
@@ -359,8 +339,8 @@ const Navigation = ({ onWindowToggle, openWindows }: NavigationProps) => {
                   padding: '12px 16px',
                   borderRadius: '12px',
                   border: 'none',
-                  background: (openWindows && openWindows[item.id as keyof typeof openWindows]) ? 'rgba(0, 64, 221, 0.1)' : 'transparent',
-                  color: (openWindows && openWindows[item.id as keyof typeof openWindows]) ? 'var(--text-body)' : 'var(--text-grey)',
+                  background: (openWindows && openWindows[item.id as keyof typeof openWindows]) ? windowStyles.card.hoverBackground : 'transparent',
+                  color: (openWindows && openWindows[item.id as keyof typeof openWindows]) ? textStyles.title : textStyles.body,
                   fontFamily: 'var(--font-family)',
                   fontSize: '14px',
                   fontWeight: '500',
@@ -369,10 +349,10 @@ const Navigation = ({ onWindowToggle, openWindows }: NavigationProps) => {
                   textAlign: 'left'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                  e.currentTarget.style.background = windowStyles.card.hoverBackground;
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = (openWindows && openWindows[item.id as keyof typeof openWindows]) ? 'rgba(0, 64, 221, 0.1)' : 'transparent';
+                  e.currentTarget.style.background = (openWindows && openWindows[item.id as keyof typeof openWindows]) ? windowStyles.card.hoverBackground : 'transparent';
                 }}
               >
                 <div style={{ width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

@@ -69,6 +69,7 @@ interface CaseStudyWindowProps {
   onNext?: () => void;
   hasPrevious?: boolean;
   hasNext?: boolean;
+  hasTopPriority?: boolean; // New prop for when opened from project selection
 }
 
 interface CaseStudy {
@@ -89,7 +90,8 @@ const CaseStudyWindow = ({
   onPrevious, 
   onNext, 
   hasPrevious = false, 
-  hasNext = false 
+  hasNext = false,
+  hasTopPriority = false
 }: CaseStudyWindowProps) => {
   const [isMinimized, setIsMinimized] = useState(false);
   const [position, setPosition] = useState({ x: 300, y: 200 });
@@ -168,7 +170,7 @@ const CaseStudyWindow = ({
           left: position.x,
           top: position.y,
           cursor: isDragging ? 'grabbing' : 'default',
-          zIndex: isActive ? 40 : 30,
+          zIndex: hasTopPriority ? 70 : (isActive ? 60 : 30),
           transition: 'z-index 0.2s ease'
         }}
       >
@@ -285,11 +287,11 @@ const CaseStudyWindow = ({
       {/* Window Content */}
       {!isMinimized && (
         <div style={{ 
-          padding: '24px',
+          padding: '24px 24px 40px 24px', // Add extra bottom padding
           background: 'transparent',
           borderBottomLeftRadius: '12px',
           borderBottomRightRadius: '12px',
-          height: 'calc(100% - 60px)',
+          maxHeight: '600px', // Set reasonable max height instead of calc constraint
           overflow: 'auto',
           boxSizing: 'border-box',
           width: '100%'
@@ -564,7 +566,7 @@ const CaseStudyWindow = ({
                 alignItems: 'center',
                 justifyContent: 'center',
                 transition: 'all 0.3s ease',
-                zIndex: isActive ? 1001 : 101
+                zIndex: hasTopPriority ? 1070 : (isActive ? 1060 : 101)
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
@@ -607,7 +609,7 @@ const CaseStudyWindow = ({
                 alignItems: 'center',
                 justifyContent: 'center',
                 transition: 'all 0.3s ease',
-                zIndex: isActive ? 1001 : 101
+                zIndex: hasTopPriority ? 1070 : (isActive ? 1060 : 101)
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';

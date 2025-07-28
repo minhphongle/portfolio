@@ -103,16 +103,53 @@ const Window = ({ title, children, onClose, isActive = true, onClick, initialPos
           borderBottom: windowStyles.titleBar.borderBottom
         }}
       >
-        <div 
-          style={{
-            fontFamily: 'var(--font-family)',
-            fontSize: '13px',
-            fontWeight: '500',
-            color: textStyles.windowTitle,
-            letterSpacing: '-0.01em'
-          }}
-        >
-          {title}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div 
+            style={{
+              fontFamily: 'var(--font-family)',
+              fontSize: '13px',
+              fontWeight: '500',
+              color: textStyles.windowTitle,
+              letterSpacing: '-0.01em'
+            }}
+          >
+            {title}
+          </div>
+          
+          {/* Drag Indicator */}
+          <div
+            style={{
+              display: 'flex',
+              gap: '2px',
+              opacity: 0.6,
+              animation: 'dragHint 2s ease-in-out infinite',
+              cursor: 'grab',
+              position: 'relative'
+            }}
+            title="Drag to move window"
+          >
+            <div style={{
+              width: '3px',
+              height: '3px',
+              borderRadius: '50%',
+              background: textStyles.windowTitle,
+              animation: 'pulse 1.5s ease-in-out infinite, dragHintDot 2s ease-in-out infinite'
+            }} />
+            <div style={{
+              width: '3px',
+              height: '3px',
+              borderRadius: '50%',
+              background: textStyles.windowTitle,
+              animation: 'pulse 1.5s ease-in-out infinite 0.2s, dragHintDot 2s ease-in-out infinite 0.2s'
+            }} />
+            <div style={{
+              width: '3px',
+              height: '3px',
+              borderRadius: '50%',
+              background: textStyles.windowTitle,
+              animation: 'pulse 1.5s ease-in-out infinite 0.4s, dragHintDot 2s ease-in-out infinite 0.4s'
+            }} />
+          </div>
         </div>
         
         <div style={{ display: 'flex', gap: '8px' }}>

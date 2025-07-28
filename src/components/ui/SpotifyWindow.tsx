@@ -11,7 +11,7 @@ interface SpotifyWindowProps {
 
 const SpotifyWindow = ({ playlistId = "6w9nkHE6jGkM9Zx7t0kcRr", onClose, isActive = true, onClick }: SpotifyWindowProps) => {
   const [isMinimized, setIsMinimized] = useState(false);
-  const [position, setPosition] = useState({ x: 700, y: 100 }); // Position to right of intro window
+  const [position, setPosition] = useState({ x: 800, y: 100 }); // Position to right of intro window, moved 30px right
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const windowRef = useRef<HTMLDivElement>(null);

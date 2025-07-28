@@ -83,7 +83,7 @@ const ProjectsWindow = ({ onClose, isActive = true, onClick, onProjectClick }: P
       id: '6',
       title: 'Policy Simulation App for Ride-hailing Industry',
       description: 'Built an SAP-powered tool to simulate gig labor policies across ASEAN; analyzed CPF, insurance, and tax impacts; aligned with UN SDGs and regional stakeholder needs.',
-      image: '/images/un.svg',
+      image: '/images/UN.svg',
       tags: ['Product Analysis', 'Design', 'Policy Research'],
       background: 'This project was created during a regional policy innovation initiative focused on the future of gig work. Our team aimed to address regulatory challenges in the ride-hailing sector by designing a tool that enables policymakers to visualize the impact of different labor policies across ASEAN countries, with a special focus on Singapore and Vietnam.',
       content: 'We built a Policy Simulation App powered by SAP technologies to model the effects of introducing CPF contributions, accident insurance, and tax schemes for platform workers. The tool integrated real-world data and supported scenario testing, helping stakeholders assess trade-offs across economic, social, and regulatory dimensions. The framework was designed to align with UN Sustainable Development Goals and regional development goals. You can view the slides and materials below. \n\n[PDF:/images/UN.pdf]'
@@ -143,7 +143,7 @@ const ProjectsWindow = ({ onClose, isActive = true, onClick, onProjectClick }: P
         boxShadow: windowStyles.boxShadow,
         overflow: 'hidden',
         width: isMinimized ? '320px' : '600px',
-        height: isMinimized ? 'auto' : '480px',
+        height: isMinimized ? 'auto' : '600px', // Increased from 480px to 600px to fit all cards
         position: 'absolute',
         left: position.x,
         top: position.y,
@@ -265,9 +265,9 @@ const ProjectsWindow = ({ onClose, isActive = true, onClick, onProjectClick }: P
       {/* Projects Content */}
       {!isMinimized && (
         <div style={{ 
-          padding: '24px',
+          padding: '24px 24px 40px 24px', // Add extra bottom padding
           background: 'transparent',
-          height: 'calc(100% - 60px)',
+          maxHeight: '520px', // Increased to match new window height (600px - title bar)
           overflow: 'auto',
           borderBottomLeftRadius: '12px',
           borderBottomRightRadius: '12px'

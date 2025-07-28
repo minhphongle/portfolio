@@ -226,11 +226,11 @@ const ExperienceWindow = ({ onClose, isActive = true, onClick }: ExperienceWindo
       {/* Content */}
       {!isMinimized && (
         <div style={{ 
-          padding: '24px',
+          padding: '24px 24px 40px 24px', // Add extra bottom padding
           background: 'transparent',
           borderBottomLeftRadius: '12px',
           borderBottomRightRadius: '12px',
-          height: 'calc(100% - 48px)',
+          maxHeight: '520px', // Set reasonable max height to match window size
           overflow: 'auto'
         }}>
           <div style={{ 

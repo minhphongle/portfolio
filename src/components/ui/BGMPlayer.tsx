@@ -14,8 +14,9 @@ const BGMPlayer = ({ src, autoPlay = true }: BGMPlayerProps) => {
   const [isVisible, setIsVisible] = useState(true);
   const [canAutoplay, setCanAutoplay] = useState(false);
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
+  const [userPaused, setUserPaused] = useState<boolean | null>(null); // null = no user action yet, true = user paused, false = user played
   const audioRef = useRef<HTMLAudioElement>(null);
-  const { getWindowStyles, getTextStyles } = useTheme();
+  const { getWindowStyles, getTextStyles, theme, toggleTheme } = useTheme();
   
   const windowStyles = getWindowStyles();
   const textStyles = getTextStyles();
@@ -25,7 +26,7 @@ const BGMPlayer = ({ src, autoPlay = true }: BGMPlayerProps) => {
     const handleUserInteraction = () => {
       setHasUserInteracted(true);
       const audio = audioRef.current;
-      if (audio && autoPlay && !isPlaying) {
+      if (audio && autoPlay && !isPlaying && userPaused !== true) {
         tryAutoplay();
       }
     };
@@ -39,7 +40,7 @@ const BGMPlayer = ({ src, autoPlay = true }: BGMPlayerProps) => {
 
     // Also try on window focus and visibility change
     const handleFocus = () => {
-      if (autoPlay && !isPlaying) {
+      if (autoPlay && !isPlaying && userPaused !== true) {
         tryAutoplay();
       }
     };
@@ -55,7 +56,7 @@ const BGMPlayer = ({ src, autoPlay = true }: BGMPlayerProps) => {
       window.removeEventListener('focus', handleFocus);
       document.removeEventListener('visibilitychange', handleFocus);
     };
-  }, [autoPlay, isPlaying]);
+  }, [autoPlay, isPlaying, userPaused]);
 
   // Try to autoplay immediately and handle volume changes
   useEffect(() => {
@@ -63,43 +64,73 @@ const BGMPlayer = ({ src, autoPlay = true }: BGMPlayerProps) => {
     if (audio) {
       audio.volume = volume;
       
-      // Try immediate autoplay on mount
-      if (autoPlay && !hasUserInteracted) {
-        tryAutoplay();
+      // Try immediate autoplay on mount - always attempt first unless user explicitly paused
+      if (autoPlay && userPaused !== true) {
+        // Small delay to ensure audio element is ready
+        setTimeout(() => {
+          tryAutoplay();
+        }, 100);
       }
     }
-  }, [autoPlay, volume, hasUserInteracted]);
+  }, [autoPlay, volume, userPaused]);
+
+  // Additional effect to try autoplay on component mount
+  useEffect(() => {
+    if (autoPlay && userPaused !== true) {
+      // Try autoplay as soon as possible
+      const timer = setTimeout(() => {
+        tryAutoplay();
+      }, 50);
+      
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   const tryAutoplay = async () => {
     const audio = audioRef.current;
-    if (audio) {
+    if (audio && userPaused !== true) {
       try {
+        // Ensure audio is loaded
+        if (audio.readyState < 2) {
+          audio.load();
+        }
+        
         // Test if autoplay is allowed
         const playPromise = audio.play();
         if (playPromise !== undefined) {
           await playPromise;
           setIsPlaying(true);
           setCanAutoplay(true);
+          console.log('Autoplay successful');
         }
-      } catch {
+      } catch (error) {
         // Autoplay blocked, will play on user interaction
         setIsPlaying(false);
         setCanAutoplay(false);
-        console.log('Autoplay blocked, waiting for user interaction');
+        console.log('Autoplay blocked, waiting for user interaction:', error);
       }
     }
   };
 
   const togglePlay = () => {
     const audio = audioRef.current;
-    if (audio) {
-      if (isPlaying) {
-        audio.pause();
-        setIsPlaying(false);
-      } else {
-        audio.play();
+    if (!audio) return;
+    
+    if (audio.paused) {
+      console.log('Audio is paused, attempting to play');
+      setUserPaused(false); // User wants to play
+      audio.play().then(() => {
+        console.log('Audio play succeeded');
         setIsPlaying(true);
-      }
+      }).catch((error) => {
+        console.log('Audio play failed:', error);
+        setIsPlaying(false);
+      });
+    } else {
+      console.log('Audio is playing, attempting to pause');
+      setUserPaused(true); // User manually paused
+      audio.pause();
+      setIsPlaying(false);
     }
   };
 
@@ -169,16 +200,39 @@ const BGMPlayer = ({ src, autoPlay = true }: BGMPlayerProps) => {
         src={src}
         loop
         preload="auto"
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
+        autoPlay={autoPlay}
+        muted={false} // Start unmuted since we want audio
+        onPlay={() => {
+          console.log('Audio onPlay event');
+          setIsPlaying(true);
+        }}
+        onPause={() => {
+          console.log('Audio onPause event');
+          setIsPlaying(false);
+        }}
+        onEnded={() => {
+          console.log('Audio ended');
+          setIsPlaying(false);
+        }}
+        onError={(e) => {
+          console.log('Audio error:', e);
+          setIsPlaying(false);
+        }}
+        onLoadedData={() => {
+          // Try autoplay when audio data is loaded
+          if (autoPlay && userPaused !== true) {
+            setTimeout(() => tryAutoplay(), 10);
+          }
+        }}
       />
       
+      {/* BGM Player Container */}
       <div
         className="bgm-player"
         style={{
           position: 'fixed',
           top: '20px',
-          right: '20px',
+          right: '80px',
           zIndex: 1002,
           display: 'flex',
           alignItems: 'center',
@@ -328,6 +382,85 @@ const BGMPlayer = ({ src, autoPlay = true }: BGMPlayerProps) => {
           }}
         >
           −
+        </button>
+      </div>
+
+      {/* Separate Theme Toggle Container */}
+      <div
+        style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          zIndex: 1002,
+          background: windowStyles.background,
+          backdropFilter: windowStyles.backdropFilter,
+          border: windowStyles.border,
+          borderRadius: '50%',
+          width: '48px',
+          height: '48px',
+          boxShadow: windowStyles.boxShadow,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          transition: 'all 0.3s ease'
+        }}
+      >
+        <button
+          onClick={toggleTheme}
+          style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '50%',
+            border: 'none',
+            background: 'transparent',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'all 0.2s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = textStyles.title.includes('255') ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'transparent';
+          }}
+        >
+          {theme === 'light' ? (
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke={textStyles.windowTitle}
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+            </svg>
+          ) : (
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke={textStyles.windowTitle}
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="12" cy="12" r="5" />
+              <line x1="12" y1="1" x2="12" y2="3" />
+              <line x1="12" y1="21" x2="12" y2="23" />
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+              <line x1="1" y1="12" x2="3" y2="12" />
+              <line x1="21" y1="12" x2="23" y2="12" />
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+            </svg>
+          )}
         </button>
       </div>
 
