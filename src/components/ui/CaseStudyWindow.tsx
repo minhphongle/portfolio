@@ -4,7 +4,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import Image from 'next/image';
 import { useTheme } from '../../context/ThemeContext';
 
-// Function to parse content with embedded images and iframes
+// Function to parse content with embedded images, iframes, and PDFs
 const parseContent = (content: string) => {
   // First, extract any iframe content and replace with placeholders
   const iframeRegex = /<iframe[^>]*>.*?<\/iframe>/gi;
@@ -14,8 +14,8 @@ const parseContent = (content: string) => {
     return `[IFRAME:${iframes.length - 1}]`;
   });
   
-  // Split content by image markers and iframe markers
-  const parts = processedContent.split(/(\[(?:IMAGE|IFRAME):[^\]]+\])/g);
+  // Split content by image markers, iframe markers, and PDF markers
+  const parts = processedContent.split(/(\[(?:IMAGE|IFRAME|PDF):[^\]]+\])/g);
   
   return parts.map((part, index) => {
     // Check if this part is an image marker
@@ -26,6 +26,17 @@ const parseContent = (content: string) => {
         type: 'image',
         content: imagePath,
         key: `image-${index}`
+      };
+    }
+    
+    // Check if this part is a PDF marker
+    const pdfMatch = part.match(/\[PDF:([^\]]+)\]/);
+    if (pdfMatch) {
+      const pdfPath = pdfMatch[1];
+      return {
+        type: 'pdf',
+        content: pdfPath,
+        key: `pdf-${index}`
       };
     }
     
@@ -418,6 +429,34 @@ const CaseStudyWindow = ({
                         priority={false}
                         style={{
                           objectFit: 'cover'
+                        }}
+                      />
+                    </div>
+                  );
+                } else if (item.type === 'pdf') {
+                  return (
+                    <div
+                      key={item.key}
+                      style={{
+                        margin: '20px 0',
+                        borderRadius: '8px',
+                        overflow: 'hidden',
+                        position: 'relative',
+                        width: '100%',
+                        height: '600px',
+                        border: '1px solid rgba(255, 255, 255, 0.2)'
+                      }}
+                    >
+                      <iframe
+                        src={item.content}
+                        title="PDF Document"
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          width: '100%',
+                          height: '100%',
+                          border: 'none'
                         }}
                       />
                     </div>

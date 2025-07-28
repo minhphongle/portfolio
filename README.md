@@ -1,4 +1,4 @@
-# Minh Phong's Portfolio
+# Minh Phong's Portfolio (Mobile Responsiveness to be added on later)
 
 A modern portfolio website built with Next.js featuring glassmorphism design and interactive window components.
 
