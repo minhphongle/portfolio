@@ -122,61 +122,61 @@ export default function Home() {
     }
   };
 
-  // Projects data (same as in ProjectsWindow)
+  // Projects data
   const projects: Project[] = [
     {
       id: '1',
-      title: 'PSA International',
-      description: 'Systems Analyst - Logistics Enhancement',
+      title: 'Reimaging TikTok LIVE’s Creator Wallet Experience',
+      description: 'An AI-powered solution to reduce payout friction and improve trust. From static FAQs to a system-aware chatbot and smart wallet onboarding. ',
       image: '/images/case1.png',
-      tags: ['Angular', 'Spring Boot', 'CI/CD'],
-      background: 'As part of my product management interview preparation, I explored TikTok’s LIVE Money Platform to better understand their payout ecosystem; particularly from the lens of user trust and operational friction. While I was not explicitly asked to prepare a case, I proactively mapped out pain points, analyzed user flows, and identified key breakdowns in payout visibility, onboarding, and issue resolution. This exercise not only deepened my understanding of TikTok’s creator monetization pipeline but also helped me craft solutions that could reduce failure rates, improve transparency, and enhance user experience through AI-driven tools.',
-      content: 'I redesigned TikTok LIVE\'s Creator Wallet experience using AI-powered solutions to reduce friction and improve creator trust. The project focused on transforming static help systems into intelligent, context-aware assistance.\n\n[IMAGE:/images/Untitled-1.svg]\n\n'
+      tags: ['Product Analysis', 'Protyping', 'Design Thinking'],
+              background: 'TikTok LIVE creators face significant friction when managing payouts and understanding wallet features. Many creators struggle with unclear processes, delayed support responses, and complex navigation that impacts their earning experience and platform trust.',
+        content: 'I redesigned TikTok LIVE\'s Creator Wallet experience using AI-powered solutions to reduce friction and improve creator trust. The project focused on transforming static help systems into intelligent, context-aware assistance.\n\n[IMAGE:/images/Untitled-86.svg]\n[IMAGE:/images/Untitled-87.svg]\n[IMAGE:/images/Untitled-88.svg]\n[IMAGE:/images/Untitled-89.svg]\n[IMAGE:/images/Untitled-90.svg]\n[IMAGE:/images/Untitled-91.svg]\n[IMAGE:/images/Untitled-92.svg]\n[IMAGE:/images/Untitled-93.svg]\n[IMAGE:/images/Untitled-94.svg]\n[IMAGE:/images/Untitled-95.svg]\n[IMAGE:/images/Untitled-96.svg]\n[IMAGE:/images/Untitled-97.svg]\n[IMAGE:/images/Untitled-98.svg]\n[IMAGE:/images/Untitled-99.svg]'
     },
     {
       id: '2',
-      title: 'Shopee',
-      description: 'Product Operations - Search Optimization',
+      title: 'EcoWardrobe - Sustainable Clothing Choices',
+      description: 'Imagine this: you snap a pic of your clothes, and EcoWardrobe, powered by Google Vision AI and Gemini, instantly tells you what it is, the fabric it\'s made of, its estimated CO2 impact, and sustainability score.',
       image: '/images/case2.png',
-      tags: ['Product Operations', 'Search', 'Analytics'],
-      background: 'In my Product Operations role at Shopee, I drove analytics projects focused on search optimization across multiple markets. The challenge was to improve search relevancy and conversion rates while managing complex product roadmaps.',
-      content: 'I led multiple analytics projects that directly impacted search performance and user experience across Shopee\'s platform.\n\nKey achievements:\n• Drove product roadmaps for 4 analytics projects enhancing search optimization\n• Achieved a 5% increase in conversion rates through search improvements\n• Conducted detailed analysis using precision and recall metrics to identify patterns\n• Improved search relevancy by 15% across 8 Southeast Asian markets\n• Wrote automation scripts for Product Operations Team, increasing efficiency by 30%\n• Collaborated with cross-functional teams to implement data-driven product decisions\n\nThe search optimization initiatives significantly enhanced user experience and contributed to measurable business growth across multiple markets.'
+      tags: ['Market Research', 'Prototyping', 'Frontend Coding'],
+      background: 'This project was built during a hackathon, where I led the end-to-end development of EcoWardrobe, an AI-powered tool designed to promote conscious fashion. By combining Google Vision AI and Gemini, the app allows users to snap a photo of their clothing and instantly receive insights like fabric type, estimated CO₂ impact, and a sustainability score. I conducted rapid market research to validate user interest in sustainable fashion, built interactive prototypes, and implemented the frontend interface to create a seamless user experience that bridges technology and sustainability.',
+      content: '<iframe width="560" height="315" src="https://www.youtube.com/embed/StvnCUFa-QY?si=fqkntCiwGOAHlgH0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>'
     },
     {
       id: '3',
-      title: 'SPH Media',
-      description: 'Data Product Analyst - Cloud Migration',
+      title: 'VibeCheck - AI Dating Coach',
+      description: 'VibeCheck is an AI-powered co-pilot that helps users communicate boundaries and disinterest more respectfully; reducing ghosting and improving trust in the app.',
       image: '/images/case3.png',
-      tags: ['Tableau', 'Cloud Migration', 'Data Governance'],
-      background: 'As a Data Product Analyst at SPH Media, I led a comprehensive migration project from on-premise to cloud analytics infrastructure. The challenge was to modernize the data platform while ensuring business continuity and cost optimization.',
-      content: 'I spearheaded the end-to-end migration of SPH Media\'s analytics infrastructure to the cloud, transforming how the organization handles data and reporting.\n\nKey achievements:\n• Led complete migration of 1 Tableau Server to Tableau Cloud infrastructure\n• Achieved $12,000 USD monthly cost savings while improving platform scalability\n• Successfully migrated over 100 dashboards to cloud environment\n• Empowered 300+ users with enhanced self-service analytics capabilities\n• Implemented comprehensive governance protocols and access controls\n• Managed compliance across 2 Tableau Servers and 2 Tableau Cloud sites\n\nThe migration project significantly improved platform performance, reduced operational costs, and enabled better data democratization across the organization.'
+      tags: ['Data Analysis', 'Product Strategy', 'Social Listening'],
+      background: 'Our team joined a hackathon organized by Product Women, Coffee Meets Bagel, and *SCAPE in celebration of International Women’s Day. The theme centered on trust and safety in dating apps, and we were challenged to design solutions that empower women by fostering safer, more respectful online dating experiences.',
+      content: 'As the sole Product Analyst in a cross-functional team with a Product Manager and Product Designer, I led the data-driven discovery phase. I scraped and analyzed user-generated content from popular Singaporean forums like Reddit and HardwareZone. Through sentiment analysis and keyword clustering, we uncovered that:87.2% of complaints were about ghosting, 35.9% mentioned inappropriate messages, 23.1% experienced both issues simultaneously. \n\n These insights shaped our problem framing and solution design which can be observed below.\n\n[PDF:/images/VibeCheck - CMB Hack.pdf].'
     },
     {
       id: '4',
-      title: 'United Visual Researchers (Paris)',
-      description: 'Business Intelligence Engineer - RPA & Analytics',
+      title: 'PetPal - Pet Service Appointment',
+      description: 'PetPal is designed to connect pet owners with essential services including pet sitting, walking, vet care, grooming, and training. The app simplifies finding and booking trusted caregivers.',
       image: '/images/case4.png',
-      tags: ['BI', 'RPA', 'Full-Stack'],
-      background: 'As a Business Intelligence Engineer at United Visual Researchers in Paris, I revolutionized the company\'s data strategy through full-stack development and automation. The challenge was to transform unstructured data into actionable insights while achieving significant cost savings.',
-      content: 'I designed and implemented comprehensive data solutions that transformed how the company handles business intelligence and regulatory reporting.\n\nKey achievements:\n• Revamped entire data strategy with full-stack reporting system for unstructured data\n• Achieved €2,000 monthly cost savings through automated data processing\n• Collaborated directly with CEO and CMO on requirements gathering\n• Created ad-hoc reports for government tax credit reclaiming, recovering €10,000+\n• Designed and implemented RPA solutions using Docker and n8n\n• Built analytics dashboards for C-suite executive decision-making\n• Reduced reporting time by 30% through automation and optimization\n\nThe comprehensive BI transformation enabled data-driven decision making at the executive level while delivering substantial cost savings and operational efficiency improvements.'
+      tags: ['User Research', 'Mental Model Mapping', 'Prototyping'],
+      background: 'PetPal was created as part of an Interaction Design course project, where we were challenged to design a user-centric digital solution for a real-world need. As a passionate pet lover, I wanted to address the everyday struggles pet owners face when trying to find reliable care and services for their furry friends.',
+      content: 'PetPal is a mobile app that connects pet owners with trusted providers for pet sitting, walking, grooming, training, and veterinary care. The app streamlines the process of discovering, booking, and reviewing pet service providers; ensuring peace of mind for owners and better care for pets.\n[IMAGE:/images/1.svg] \n[IMAGE:/images/2.svg] \n[IMAGE:/images/3.svg] \n[IMAGE:/images/4.svg] \n[IMAGE:/images/5.svg] \n[IMAGE:/images/6.svg] \n[IMAGE:/images/7.svg] \n[IMAGE:/images/8.svg] \n[IMAGE:/images/9.svg] \n[IMAGE:/images/10.svg] \n[IMAGE:/images/11.svg] \n[IMAGE:/images/12.svg] \n[IMAGE:/images/13.svg] \n[IMAGE:/images/14.svg] \n[IMAGE:/images/15.svg] \n[IMAGE:/images/16.svg] \n[IMAGE:/images/17.svg] \n[IMAGE:/images/18.svg] \n[IMAGE:/images/19.svg] \n[IMAGE:/images/20.svg] \n[IMAGE:/images/21.svg] \n[IMAGE:/images/22.svg] \n[IMAGE:/images/23.svg] \n[IMAGE:/images/24.svg] \n[IMAGE:/images/25.svg] \n[IMAGE:/images/26.svg] \n[IMAGE:/images/27.svg] \n[IMAGE:/images/28.svg] \n[IMAGE:/images/29.svg] \n[IMAGE:/images/30.svg] \n[IMAGE:/images/31.svg] \n[IMAGE:/images/32.svg] \n[IMAGE:/images/33.svg] \n[IMAGE:/images/34.svg] \n[IMAGE:/images/35.svg] \n[IMAGE:/images/36.svg] \n[IMAGE:/images/37.svg] \n[IMAGE:/images/38.svg] \n[IMAGE:/images/39.svg] \n[IMAGE:/images/40.svg] \n[IMAGE:/images/41.svg] \n[IMAGE:/images/42.svg] \n[IMAGE:/images/43.svg] \n[IMAGE:/images/44.svg] \n[IMAGE:/images/45.svg]'
     },
     {
       id: '5',
-      title: 'University Research',
-      description: 'HCI & User Behavior Study',
-      image: '/images/case1.png',
-      tags: ['Research', 'HCI', 'Academic'],
-      background: 'As part of my Information Systems studies at NUS, I conducted research on human-computer interaction patterns in mobile applications, focusing on how design elements influence user behavior and decision-making.',
-      content: 'The research involved designing and conducting controlled experiments to measure the impact of UI/UX design choices on user engagement and task completion rates.\n\nResearch methodology:\n• Designed experimental frameworks for A/B testing\n• Recruited and managed 200+ research participants\n• Used eye-tracking and behavioral analytics tools\n• Applied statistical analysis to validate findings\n• Published findings in academic conferences\n\nThe research contributed to understanding of mobile interface design principles and was recognized at the NUS School of Computing Research Showcase.'
+      title: 'Shopback NearYou',
+      description: 'Redesigning Shopback experience to gain foot traffic from local merchants.',
+      image: '/images/shopback.svg',
+      tags: ['Research', 'Revamp', 'Product Strategy'],
+      background: 'This project was developed as part of the ShopBack x NTU Product Hackathon, where participants were challenged to improve the offline-to-online experience for ShopBack users and drive more foot traffic to local merchants. As part of a 5-member team, I explored how ShopBack’s vast ecosystem could better support neighborhood stores and enhance discovery and redemption of in-store vouchers.',
+      content: 'We conducted user interviews and competitor analysis, revealing that users found it difficult to discover nearby deals and merchants lacked visibility. Our solution was ShopBack NearYou, a redesigned homepage and location-based discovery feature that surfaces nearby stores and auto-redeemable vouchers. This promotes spontaneous visits and better merchant exposure. You can view the full pitch deck below. \n\n[PDF:/images/ShopBack Product Hackathon Pitch Deck.pdf]'
     },
     {
       id: '6',
-      title: 'Personal Project',
-      description: 'Portfolio Website',
-      image: '/images/case2.png',
-      tags: ['Web Dev', 'Design', 'Personal'],
-      background: 'Created this interactive portfolio website to showcase my work and technical skills. The challenge was to design a unique, memorable experience that reflects my personality while maintaining professional credibility.',
-      content: 'Designed and developed a Poolsuite.net-inspired glassmorphism portfolio with Apple-like aesthetics. The project involved both design and technical implementation challenges.\n\nTechnical features:\n• React/Next.js with TypeScript\n• Responsive design with mobile-first approach\n• Glassmorphism UI with light/dark themes\n• Draggable window components\n• Spotify integration and background music\n• AI chatbot for interactive resume queries\n\nThe portfolio demonstrates both technical skills and design sensibility, creating an engaging way for potential employers to learn about my background and experience.'
+      title: 'Policy Simulation App for Ride-hailing Industry',
+      description: 'Built an SAP-powered tool to simulate gig labor policies across ASEAN; analyzed CPF, insurance, and tax impacts; aligned with UN SDGs and regional stakeholder needs.',
+      image: '/images/un.svg',
+      tags: ['Product Analysis', 'Design', 'Policy Research'],
+      background: 'This project was created during a regional policy innovation initiative focused on the future of gig work. Our team aimed to address regulatory challenges in the ride-hailing sector by designing a tool that enables policymakers to visualize the impact of different labor policies across ASEAN countries, with a special focus on Singapore and Vietnam.',
+      content: 'We built a Policy Simulation App powered by SAP technologies to model the effects of introducing CPF contributions, accident insurance, and tax schemes for platform workers. The tool integrated real-world data and supported scenario testing, helping stakeholders assess trade-offs across economic, social, and regulatory dimensions. The framework was designed to align with UN Sustainable Development Goals and regional development goals. You can view the slides and materials below. \n\n[PDF:/images/UN.pdf]'
     }
   ];
 
