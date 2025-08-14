@@ -256,29 +256,31 @@ export default function Home() {
   const hasNext = getCurrentCaseStudyIndex() < projects.length - 1;
 
   return (
-    <div style={{ 
-      backgroundImage: 'url(/images/bg.gif)',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat',
-      backgroundAttachment: 'fixed',
-      color: 'var(--text-body)', 
-      minHeight: '100vh', 
-      width: '100vw',
-      overflow: 'auto',
+    <div       style={{ 
+        backgroundImage: 'url(/images/bg.gif)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: isMobile ? 'scroll' : 'fixed', // Use scroll on mobile for better performance
+        color: 'var(--text-body)', 
+        minHeight: '100vh', 
+        width: '100vw',
+              overflow: isMobile ? 'hidden' : 'auto', // Prevent scrolling on mobile
       position: 'relative',
-      paddingBottom: '200px', // Add extra space at bottom for windows
-      top: 0,
-      left: 0
-    }}>
+      paddingBottom: isMobile ? '0px' : '200px', // No bottom padding on mobile
+        top: 0,
+        left: 0
+      }}>
       {/* Hero Section */}
       <section 
         className="hero-section"
         style={{ 
           background: 'transparent',
-          paddingLeft: '200px', 
-          paddingRight: '200px', 
-          minHeight: '100vh' 
+          paddingLeft: isMobile ? '20px' : '200px', 
+          paddingRight: isMobile ? '20px' : '200px', 
+          height: isMobile ? '100vh' : 'auto',
+          minHeight: isMobile ? 'unset' : '100vh',
+          overflow: isMobile ? 'hidden' : 'visible'
         }}
       >
         {isMobile ? (
@@ -293,14 +295,14 @@ export default function Home() {
                   onClose={() => setShowAbout(false)}
                 >
                   {/* Mobile-optimized layout */}
-                  <div className="flex flex-col items-center" style={{ gap: '20px' }}>
-                    {/* Image first on mobile */}
-                    <div className="flex-shrink-0">
+                  <div className="flex flex-col items-center" style={{ gap: '20px', width: '100%', maxWidth: '100%', margin: '0', padding: '0' }}>
+                    {/* Image first on mobile - centered */}
+                    <div className="flex-shrink-0" style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
                       <Image
                         src="/images/my-photo.png"
                         alt="Minh Phong"
-                        width={200}
-                        height={312}
+                        width={180}
+                        height={280}
                         className="object-cover"
                         style={{ borderRadius: '16px' }}
                         priority
@@ -308,18 +310,19 @@ export default function Home() {
                     </div>
                     
                     {/* Content below image */}
-                    <div className="flex flex-col" style={{ gap: '16px', textAlign: 'center' }}>
+                    <div className="flex flex-col" style={{ gap: '16px', textAlign: 'center', width: '100%', alignItems: 'center' }}>
                       {/* Title Section */}
-                      <div className="flex flex-col" style={{ gap: '4px' }}>
+                      <div className="flex flex-col" style={{ gap: '4px', textAlign: 'center', width: '100%' }}>
                         <div 
                           style={{ 
                             color: textStyles.title,
                             fontFamily: 'var(--font-family)',
-                            fontSize: 'clamp(20px, 5vw, 24px)',
+                            fontSize: 'clamp(18px, 4.5vw, 22px)',
                             lineHeight: '1.2',
                             fontWeight: '600',
                             letterSpacing: '-0.02em',
-                            textShadow: textStyles.title.includes('255') ? '0 1px 2px rgba(0, 0, 0, 0.3)' : 'none'
+                            textShadow: textStyles.title.includes('255') ? '0 1px 2px rgba(0, 0, 0, 0.3)' : 'none',
+                            textAlign: 'center'
                           }}
                         >
                           hi, i am <span 
@@ -337,11 +340,12 @@ export default function Home() {
                           style={{ 
                             color: textStyles.title,
                             fontFamily: 'var(--font-family)',
-                            fontSize: 'clamp(20px, 5vw, 24px)',
+                            fontSize: 'clamp(18px, 4.5vw, 22px)',
                             lineHeight: '1.2',
                             fontWeight: '600',
                             letterSpacing: '-0.02em',
-                            textShadow: textStyles.title.includes('255') ? '0 1px 2px rgba(0, 0, 0, 0.3)' : 'none'
+                            textShadow: textStyles.title.includes('255') ? '0 1px 2px rgba(0, 0, 0, 0.3)' : 'none',
+                            textAlign: 'center'
                           }}
                         >
                           a Product Analyst based in Singapore
@@ -353,11 +357,13 @@ export default function Home() {
                         style={{ 
                           color: textStyles.body,
                           fontFamily: 'var(--font-family)',
-                          fontSize: 'clamp(12px, 3.5vw, 14px)',
+                          fontSize: 'clamp(12px, 3.2vw, 14px)',
                           lineHeight: '1.4',
                           fontWeight: '600',
                           letterSpacing: '-0.01em',
-                          textShadow: textStyles.body.includes('255') ? '0 1px 2px rgba(0, 0, 0, 0.3)' : 'none'
+                          textShadow: textStyles.body.includes('255') ? '0 1px 2px rgba(0, 0, 0, 0.3)' : 'none',
+                          textAlign: 'center',
+                          width: '100%'
                         }}
                       >
                         Seeking full-time new grad opportunities in Product, Data, Strategy & Ops
@@ -366,12 +372,17 @@ export default function Home() {
                       {/* Description */}
                       <div style={{ 
                         color: textStyles.body, 
-                        fontSize: 'clamp(11px, 3vw, 13px)', 
-                        lineHeight: '1.4', 
+                        fontSize: 'clamp(11px, 2.8vw, 13px)', 
+                        lineHeight: '1.5', 
                         fontWeight: '400', 
                         letterSpacing: '-0.01em',
                         textShadow: textStyles.body.includes('255') ? '0 1px 2px rgba(0, 0, 0, 0.3)' : 'none',
-                        textAlign: 'left'
+                        textAlign: 'center',
+                        width: '100%',
+                        maxWidth: '100%',
+                        wordWrap: 'break-word',
+                        overflowWrap: 'break-word',
+                        hyphens: 'auto'
                       }}>
                         In my final semester as an ASEAN Scholar studying Information Systems @ NUS, 
                         driven by a passion for HCI and building meaningful products. I chose this path to 
@@ -634,7 +645,7 @@ export default function Home() {
       {/* Chat Bar */}
       <ChatBar 
         onSendMessage={handleSendMessage}
-        placeholder="Ask anything about Minh Phong..."
+        placeholder="Ask anything about Phong..."
         onChatBotToggle={handleChatBotToggle}
       />
 

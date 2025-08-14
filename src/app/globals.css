@@ -52,21 +52,139 @@ html, body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
   height: 100%;
-  overflow: hidden;
-  margin: 0;
-  padding: 0;
-  position: fixed;
-  width: 100%;
 }
 
 /* Mobile responsive styles */
+.mobile-window-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px 0;
+  min-height: 100vh;
+}
+
+.mobile-window {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Mobile optimizations */
 @media (max-width: 768px) {
+  .mobile-window-stack {
+    gap: 16px;
+    padding: 16px 20px 80px 20px; /* Add large bottom padding for chat bar */
+    height: calc(100vh - 130px); /* 10px shorter to account for chat bar */
+    overflow-y: auto; /* Allow scrolling within the stack */
+    overflow-x: hidden;
+  }
+  
+  /* Prevent body scrolling on mobile */
   html, body {
+    overflow: hidden !important;
+    height: 100vh !important;
+    position: fixed !important;
+    width: 100% !important;
+  }
+  
+  /* Make mobile windows fit screen with scrollable content */
+  .mobile-window {
+    width: 100%;
+    max-width: 100%;
+    height: calc(100vh - 190px); /* 10px shorter - very short height to ensure space above chat bar */
+    max-height: calc(100vh - 190px);
+    overflow: hidden;
+    margin-bottom: 20px; /* Extra margin above chat bar */
+  }
+  
+  /* Mobile window content should be scrollable */
+  .mobile-window .window-container {
+    position: relative !important;
+    left: 0 !important;
+    top: 0 !important;
+    height: 100% !important;
+    width: 100% !important;
+    min-width: unset !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  
+  .mobile-window .window-container > div:last-child {
+    flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    width: 100%;
+    padding: 15px; /* Add some padding for better text layout */
+    box-sizing: border-box;
+    position: relative; /* Ensure proper positioning */
+  }
+  
+  /* Ensure About Me content stays within window */
+  .mobile-window .window-container > div:last-child > div {
+    width: 100%;
+    max-width: 100%;
     position: relative;
-    height: auto;
-    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Ensure mobile windows don't exceed viewport */
+  .mobile-window-stack > * {
+    max-height: calc(100vh - 190px);
+  }
+  
+  /* Force chat bar to bottom on mobile with no gap */
+  .chat-bar-container,
+  #chat-bar-mobile {
+    position: fixed !important;
+    bottom: 0px !important;
+    left: 0px !important;
+    right: 0px !important;
+    transform: none !important;
+    width: 100vw !important;
+    max-width: none !important;
+    z-index: 1000 !important;
+    padding: 10px !important;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom)) !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Ultra specific override for mobile chat bar */
+  @media (max-width: 768px) {
+    div#chat-bar-mobile.chat-bar-container {
+      position: fixed !important;
+      bottom: 0px !important;
+      left: 0px !important;
+      right: 0px !important;
+      transform: none !important;
+      width: 100vw !important;
+      max-width: none !important;
+      z-index: 1001 !important; /* Higher z-index than windows */
+      padding: 10px !important;
+      padding-bottom: calc(10px + env(safe-area-inset-bottom)) !important;
+      margin: 0 !important;
+      box-sizing: border-box !important;
+    }
+    
+    /* Ensure windows stay in safe zone above chat bar */
+    .mobile-window-stack {
+      max-height: calc(100vh - 110px) !important;
+      padding-bottom: 100px !important;
+    }
+    
+    .mobile-window {
+      max-height: calc(100vh - 210px) !important;
+    }
+  }
+  
+  /* BGM Player mobile optimization */
+  .bgm-player {
+    right: 80px !important;
+    top: 20px !important;
+    width: 49px !important;
+    height: 49px !important;
   }
   
   .hero-section {

@@ -15,11 +15,23 @@ const BGMPlayer = ({ src, autoPlay = true }: BGMPlayerProps) => {
   const [canAutoplay, setCanAutoplay] = useState(false);
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
   const [userPaused, setUserPaused] = useState<boolean | null>(null); // null = no user action yet, true = user paused, false = user played
+  const [isMobile, setIsMobile] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const { getWindowStyles, getTextStyles, theme, toggleTheme } = useTheme();
   
   const windowStyles = getWindowStyles();
   const textStyles = getTextStyles();
+
+  // Check if we're on mobile
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
 
   // Detect user interaction to enable autoplay
   useEffect(() => {
@@ -226,37 +238,36 @@ const BGMPlayer = ({ src, autoPlay = true }: BGMPlayerProps) => {
         }}
       />
       
-      {/* BGM Player Container */}
-      <div
-        className="bgm-player"
-        style={{
-          position: 'fixed',
-          top: '20px',
-          right: '80px',
-          zIndex: 1002,
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          background: windowStyles.background,
-          backdropFilter: windowStyles.backdropFilter,
-          border: windowStyles.border,
-          borderRadius: '24px',
-          padding: '12px 16px',
-          boxShadow: windowStyles.boxShadow,
-          transition: 'all 0.3s ease'
-        }}
-      >
-                 {/* Play/Pause Button */}
+      {/* BGM Player Container - Hidden on mobile */}
+      {!isMobile && (
+        <div
+          className="bgm-player"
+          style={{
+            position: 'fixed',
+            top: '20px',
+            right: '80px', // Position next to theme toggle
+            zIndex: 1002,
+            background: windowStyles.background,
+            backdropFilter: windowStyles.backdropFilter,
+            border: windowStyles.border,
+            borderRadius: '50%',
+            width: '49px',
+            height: '49px',
+            boxShadow: windowStyles.boxShadow,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'all 0.3s ease'
+          }}
+        >
         <button
           onClick={togglePlay}
           style={{
             width: '32px',
             height: '32px',
-            borderRadius: '16px',
+            borderRadius: '50%',
             border: 'none',
-            background: !isPlaying && !canAutoplay 
-              ? (textStyles.title.includes('255') ? 'rgba(100, 150, 255, 0.3)' : 'rgba(0, 64, 221, 0.2)')
-              : (textStyles.title.includes('255') ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'),
+            background: 'transparent',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -265,20 +276,16 @@ const BGMPlayer = ({ src, autoPlay = true }: BGMPlayerProps) => {
             animation: !isPlaying && !canAutoplay ? 'pulse 2s ease-in-out infinite' : 'none'
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = !isPlaying && !canAutoplay
-              ? (textStyles.title.includes('255') ? 'rgba(100, 150, 255, 0.4)' : 'rgba(0, 64, 221, 0.3)')
-              : (textStyles.title.includes('255') ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)');
+            e.currentTarget.style.background = textStyles.title.includes('255') ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = !isPlaying && !canAutoplay 
-              ? (textStyles.title.includes('255') ? 'rgba(100, 150, 255, 0.3)' : 'rgba(0, 64, 221, 0.2)')
-              : (textStyles.title.includes('255') ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)');
+            e.currentTarget.style.background = 'transparent';
           }}
         >
           {isPlaying ? (
             <svg
-              width="14"
-              height="14"
+              width="16"
+              height="16"
               viewBox="0 0 24 24"
               fill={textStyles.windowTitle}
               stroke="none"
@@ -288,8 +295,8 @@ const BGMPlayer = ({ src, autoPlay = true }: BGMPlayerProps) => {
             </svg>
           ) : (
             <svg
-              width="14"
-              height="14"
+              width="16"
+              height="16"
               viewBox="0 0 24 24"
               fill={textStyles.windowTitle}
               stroke="none"
@@ -299,93 +306,81 @@ const BGMPlayer = ({ src, autoPlay = true }: BGMPlayerProps) => {
           )}
         </button>
 
-        {/* Volume Control */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke={textStyles.windowTitle}
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-            {volume > 0.5 && <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />}
-            {volume > 0.2 && <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />}
-          </svg>
-          
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.1"
-            value={volume}
-            onChange={handleVolumeChange}
+        {/* Volume Control Popup - Only on hover/focus for desktop */}
+        {!isMobile && (
+          <div 
+            className="volume-popup"
             style={{
-              width: '80px',
-              height: '4px',
-              borderRadius: '2px',
-              background: textStyles.title.includes('255') ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
-              outline: 'none',
-              cursor: 'pointer',
-              appearance: 'none',
-              WebkitAppearance: 'none'
+              position: 'absolute',
+              top: '100%',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              marginTop: '8px',
+              background: windowStyles.background,
+              backdropFilter: windowStyles.backdropFilter,
+              border: windowStyles.border,
+              borderRadius: '20px',
+              padding: '8px 12px',
+              boxShadow: windowStyles.boxShadow,
+              display: 'none',
+              alignItems: 'center',
+              gap: '8px',
+              whiteSpace: 'nowrap',
+              opacity: '0',
+              transition: 'all 0.2s ease',
+              pointerEvents: 'none'
             }}
-            className="volume-slider"
-          />
-        </div>
-
-        {/* Aesthetic Bar with Copyright */}
-        <div style={{
-          height: '20px',
-          width: '1px',
-          background: textStyles.title.includes('255') ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
-          margin: '0 4px'
-        }} />
-        
-        <div style={{
-          fontSize: '10px',
-          fontFamily: 'var(--font-family)',
-          color: textStyles.windowTitle,
-          opacity: 0.7,
-          whiteSpace: 'nowrap',
-          letterSpacing: '-0.01em'
-        }}>
-          Thanks for visiting my portfolio © 2025 Le Minh Phong
-        </div>
-
-        {/* Minimize Button */}
-        <button
-          onClick={toggleVisibility}
-          style={{
-            width: '24px',
-            height: '24px',
-            borderRadius: '12px',
-            border: 'none',
-            background: 'transparent',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: textStyles.windowTitle,
-            fontSize: '12px',
-            fontWeight: '600',
-            transition: 'all 0.2s ease'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = textStyles.title.includes('255') ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'transparent';
-          }}
-        >
-          −
-        </button>
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke={textStyles.windowTitle}
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+              {volume > 0.5 && <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />}
+              {volume > 0.2 && <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />}
+            </svg>
+            
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.1"
+              value={volume}
+              onChange={handleVolumeChange}
+              style={{
+                width: '60px',
+                height: '4px',
+                borderRadius: '2px',
+                background: textStyles.title.includes('255') ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
+                outline: 'none',
+                cursor: 'pointer',
+                appearance: 'none',
+                WebkitAppearance: 'none'
+              }}
+              className="volume-slider"
+            />
+            
+            <span style={{
+              fontSize: '10px',
+              fontFamily: 'var(--font-family)',
+              color: textStyles.windowTitle,
+              opacity: 0.7,
+              letterSpacing: '-0.01em'
+            }}>
+              {Math.round(volume * 100)}%
+            </span>
+          </div>
+        )}
       </div>
+      )}
 
-      {/* Separate Theme Toggle Container */}
+      {/* Theme Toggle Container */}
       <div
         style={{
           position: 'fixed',
@@ -396,8 +391,8 @@ const BGMPlayer = ({ src, autoPlay = true }: BGMPlayerProps) => {
           backdropFilter: windowStyles.backdropFilter,
           border: windowStyles.border,
           borderRadius: '50%',
-          width: '48px',
-          height: '48px',
+          width: '49px',
+          height: '49px',
           boxShadow: windowStyles.boxShadow,
           display: 'flex',
           alignItems: 'center',
@@ -475,6 +470,12 @@ const BGMPlayer = ({ src, autoPlay = true }: BGMPlayerProps) => {
             opacity: 0.7;
             transform: scale(1.05);
           }
+        }
+        
+        .bgm-player:hover .volume-popup {
+          display: flex !important;
+          opacity: 1 !important;
+          pointer-events: auto !important;
         }
         
         .volume-slider::-webkit-slider-thumb {

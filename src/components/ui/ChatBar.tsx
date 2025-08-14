@@ -12,11 +12,12 @@ interface ChatBarProps {
 
 const ChatBar = ({ 
   onSendMessage, 
-  placeholder = "Ask anything about Minh Phong...", 
+  placeholder = "Ask anything about Phong...", 
   disabled = false,
   onChatBotToggle
 }: ChatBarProps) => {
   const [message, setMessage] = useState('');
+  const [isMobile, setIsMobile] = useState(false);
   const { getWindowStyles, getTextStyles } = useTheme();
   const windowStyles = getWindowStyles();
   const textStyles = getTextStyles();
@@ -26,6 +27,48 @@ const ChatBar = ({
 
   // Use stable class name to avoid hydration mismatch
   const textareaClass = 'chat-textarea-dynamic';
+
+  // Check if we're on mobile and inject CSS
+  useEffect(() => {
+    const checkIsMobile = () => {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      console.log('ChatBar - Mobile detected:', mobile, 'Width:', window.innerWidth);
+      
+      // Inject CSS for mobile chat bar
+      if (mobile) {
+        const styleId = 'mobile-chat-bar-fix';
+        let styleElement = document.getElementById(styleId) as HTMLStyleElement;
+        
+        if (!styleElement) {
+          styleElement = document.createElement('style');
+          styleElement.id = styleId;
+          document.head.appendChild(styleElement);
+        }
+        
+        styleElement.innerHTML = `
+          #chat-bar-mobile {
+            position: fixed !important;
+            bottom: 0px !important;
+            left: 0px !important;
+            right: 0px !important;
+            transform: none !important;
+            width: 100vw !important;
+            max-width: none !important;
+            z-index: 1000 !important;
+            padding: 10px !important;
+            padding-bottom: calc(10px + env(safe-area-inset-bottom)) !important;
+            margin: 0 !important;
+            box-sizing: border-box !important;
+          }
+        `;
+      }
+    };
+    
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
 
   // Update CSS custom property and inject specific styles for placeholder color
   useEffect(() => {
@@ -66,15 +109,20 @@ const ChatBar = ({
 
     return (
         <div
+      id="chat-bar-mobile"
       className="chat-bar-container"
       style={{
         position: 'fixed',
-        bottom: '20px',
-        left: '50%',
-        transform: 'translateX(-50%)',
+        bottom: isMobile ? '0px' : '20px',
+        left: isMobile ? '0px' : '50%', // Full left positioning on mobile
+        transform: isMobile ? 'none' : 'translateX(-50%)', // No transform on mobile
         zIndex: 1000,
-        width: '90%',
-        maxWidth: '800px'
+        width: isMobile ? '100vw' : '90%', // Use viewport width on mobile
+        maxWidth: isMobile ? 'none' : '800px',
+        padding: isMobile ? '10px' : '0',
+        paddingBottom: isMobile ? `calc(10px + env(safe-area-inset-bottom))` : '0',
+        margin: '0', // Ensure no margin
+        boxSizing: 'border-box' // Include padding in width calculation
       }}
     >
       <form onSubmit={handleSubmit}>
