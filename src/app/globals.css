@@ -124,7 +124,7 @@ html, body {
 
   
   /* Ensure mobile windows don't exceed viewport */
-  .mobile-window-stack > * {
+  .mobile-window-stack > *:not(.mobile-about-window) {
     max-height: calc(100vh - 190px);
   }
   
@@ -170,6 +170,12 @@ html, body {
     
     .mobile-window {
       max-height: calc(100vh - 210px) !important;
+    }
+    
+    /* About Me window specific height adjustment - match Experience window */
+    .mobile-about-window {
+      max-height: calc(100vh - 210px) !important;
+      height: calc(100vh - 210px) !important;
     }
   }
   
@@ -302,6 +308,11 @@ html, body {
     margin-bottom: 10px !important;
     height: auto !important;
     max-height: 500px !important;
+  }
+  
+  .case-study-window {
+    max-height: 380px !important;
+    height: 380px !important;
   }
   
   /* Mobile projects grid - single column */

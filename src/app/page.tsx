@@ -287,7 +287,7 @@ export default function Home() {
           /* Mobile: Stack windows vertically */
           <div className="mobile-window-stack">
             {showAbout && (
-              <div className="mobile-window">
+              <div className="mobile-window mobile-about-window">
                 <Window 
                   title="About Minh Phong"
                   isActive={activeWindow === 'intro'}
@@ -434,7 +434,7 @@ export default function Home() {
             
             {/* Case Study Window */}
             {selectedCaseStudy && (
-              <div className="mobile-window">
+              <div className="mobile-window mobile-about-window">
                 <CaseStudyWindow 
                   caseStudy={selectedCaseStudy}
                   onClose={handleCloseCaseStudy}
