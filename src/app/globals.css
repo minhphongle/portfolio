@@ -90,8 +90,8 @@ html, body {
   .mobile-window {
     width: 100%;
     max-width: 100%;
-    height: calc(100vh - 190px); /* 10px shorter - very short height to ensure space above chat bar */
-    max-height: calc(100vh - 190px);
+    height: calc(100vh - 150px); /* Match the perfect height of other windows */
+    max-height: calc(100vh - 150px);
     overflow: hidden;
     margin-bottom: 20px; /* Extra margin above chat bar */
   }
@@ -131,7 +131,7 @@ html, body {
   
   /* Ensure mobile windows don't exceed viewport */
   .mobile-window-stack > * {
-    max-height: calc(100vh - 190px);
+    max-height: calc(100vh - 150px);
   }
   
   /* Force chat bar to bottom on mobile with no gap */
@@ -175,7 +175,8 @@ html, body {
     }
     
     .mobile-window {
-      max-height: calc(100vh - 210px) !important;
+      max-height: calc(100vh - 150px) !important;
+      height: calc(100vh - 150px) !important;
     }
   }
   
