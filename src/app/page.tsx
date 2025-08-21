@@ -75,14 +75,41 @@ export default function Home() {
 
   // Calculate About Me height to match Experience window height
   useEffect(() => {
+    let resizeObserver: ResizeObserver | null = null;
+    
     const calculateAboutMeHeight = () => {
       if (isMobile) {
-        // On mobile, find the Experience window element and get its computed height
-        const experienceWindow = document.querySelector('.experience-window');
-        if (experienceWindow && showExperience) {
-          const computedStyle = window.getComputedStyle(experienceWindow);
-          const experienceHeight = computedStyle.height;
-          setAboutMeHeight(experienceHeight);
+        // On mobile, find the Experience window container div
+        const allMobileWindows = document.querySelectorAll('.mobile-window-stack .mobile-window');
+        let experienceContainer: Element | null = null;
+        
+        // Find the container that has an ExperienceWindow inside
+        for (const container of allMobileWindows) {
+          if (container.querySelector('.experience-window')) {
+            experienceContainer = container;
+            break;
+          }
+        }
+        
+        if (experienceContainer && showExperience) {
+          // Get the actual rendered height of the Experience window container
+          const rect = experienceContainer.getBoundingClientRect();
+          const actualHeight = rect.height;
+          setAboutMeHeight(`${actualHeight}px`);
+          
+          // Set up ResizeObserver to watch for height changes
+          if (resizeObserver) {
+            resizeObserver.disconnect();
+          }
+          
+          resizeObserver = new ResizeObserver((entries) => {
+            for (const entry of entries) {
+              const newHeight = entry.contentRect.height;
+              setAboutMeHeight(`${newHeight}px`);
+            }
+          });
+          
+          resizeObserver.observe(experienceContainer);
         } else {
           // Default to mobile-window height when Experience window is not visible
           setAboutMeHeight('calc(100vh - 210px)');
@@ -93,13 +120,19 @@ export default function Home() {
       }
     };
 
-    // Calculate initially
-    calculateAboutMeHeight();
+    // Use multiple timeouts to ensure DOM is fully rendered
+    const timeoutId1 = setTimeout(calculateAboutMeHeight, 50);
+    const timeoutId2 = setTimeout(calculateAboutMeHeight, 200);
+    const timeoutId3 = setTimeout(calculateAboutMeHeight, 500);
 
-    // Recalculate when window state changes
-    const timeoutId = setTimeout(calculateAboutMeHeight, 100);
-
-    return () => clearTimeout(timeoutId);
+    return () => {
+      clearTimeout(timeoutId1);
+      clearTimeout(timeoutId2);
+      clearTimeout(timeoutId3);
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
+    };
   }, [isMobile, showExperience, showAbout]);
 
   // Show drag hint when first window opens on desktop
