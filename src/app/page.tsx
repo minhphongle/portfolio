@@ -295,7 +295,7 @@ export default function Home() {
                   onClose={() => setShowAbout(false)}
                 >
                   {/* Mobile-optimized layout */}
-                  <div className="flex flex-col items-center" style={{ gap: '20px', width: '100%', maxWidth: '100%', margin: '0', padding: '0' }}>
+                  <div className="flex flex-col items-center" style={{ gap: '20px' }}>
                     {/* Image first on mobile - centered */}
                     <div className="flex-shrink-0" style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
                       <Image

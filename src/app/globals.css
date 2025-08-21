@@ -90,13 +90,13 @@ html, body {
   .mobile-window {
     width: 100%;
     max-width: 100%;
-    height: calc(100vh - 150px); /* Match the perfect height of other windows */
-    max-height: calc(100vh - 150px);
+    height: calc(100vh - 190px);
+    max-height: calc(100vh - 190px);
     overflow: hidden;
-    margin-bottom: 20px; /* Extra margin above chat bar */
+    margin-bottom: 20px;
   }
   
-  /* Mobile window content should be scrollable */
+  /* Only make About Me window container match other windows height */
   .mobile-window .window-container {
     position: relative !important;
     left: 0 !important;
@@ -108,30 +108,24 @@ html, body {
     flex-direction: column !important;
   }
   
+  /* Make About Me content area exactly match Experience window behavior */
   .mobile-window .window-container > div:last-child {
     flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    overflow: auto !important;
     width: 100%;
-    padding: 15px; /* Add some padding for better text layout */
+    padding: 24px 24px 40px 24px !important;
     box-sizing: border-box;
-    position: relative; /* Ensure proper positioning */
+    background: transparent;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    max-height: none !important;
   }
   
-  /* Ensure About Me content stays within window */
-  .mobile-window .window-container > div:last-child > div {
-    width: 100%;
-    max-width: 100%;
-    position: relative;
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
+
   
   /* Ensure mobile windows don't exceed viewport */
   .mobile-window-stack > * {
-    max-height: calc(100vh - 150px);
+    max-height: calc(100vh - 190px);
   }
   
   /* Force chat bar to bottom on mobile with no gap */
@@ -175,8 +169,7 @@ html, body {
     }
     
     .mobile-window {
-      max-height: calc(100vh - 150px) !important;
-      height: calc(100vh - 150px) !important;
+      max-height: calc(100vh - 210px) !important;
     }
   }
   
