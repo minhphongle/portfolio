@@ -124,7 +124,7 @@ html, body {
 
   
   /* Ensure mobile windows don't exceed viewport */
-  .mobile-window-stack > *:not(.mobile-about-window) {
+  .mobile-window-stack > * {
     max-height: calc(100vh - 190px);
   }
   
@@ -172,11 +172,6 @@ html, body {
       max-height: calc(100vh - 210px) !important;
     }
     
-    /* About Me window specific height adjustment - 30px shorter than Experience window */
-    .mobile-about-window {
-      max-height: calc(100vh - 280px) !important;
-      height: calc(100vh - 280px) !important;
-    }
   }
   
   /* BGM Player mobile optimization */
