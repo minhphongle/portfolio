@@ -174,8 +174,8 @@ html, body {
     
     /* About Me window specific height adjustment - 30px shorter than Experience window */
     .mobile-about-window {
-      max-height: calc(100vh - 240px) !important;
-      height: calc(100vh - 240px) !important;
+      max-height: calc(100vh - 280px) !important;
+      height: calc(100vh - 280px) !important;
     }
   }
   
