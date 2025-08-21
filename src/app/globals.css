@@ -172,10 +172,10 @@ html, body {
       max-height: calc(100vh - 210px) !important;
     }
     
-    /* About Me window specific height adjustment - match Experience window */
+    /* About Me window specific height adjustment - 30px shorter than Experience window */
     .mobile-about-window {
-      max-height: calc(100vh - 210px) !important;
-      height: calc(100vh - 210px) !important;
+      max-height: calc(100vh - 240px) !important;
+      height: calc(100vh - 240px) !important;
     }
   }
   
