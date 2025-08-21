@@ -36,6 +36,7 @@ export default function Home() {
   const [showChatBot, setShowChatBot] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [showDragHint, setShowDragHint] = useState(false);
+  const [aboutMeHeight, setAboutMeHeight] = useState<string>('calc(100vh - 210px)'); // Default mobile height
   const { getTextStyles } = useTheme();
   const textStyles = getTextStyles();
 
@@ -71,6 +72,35 @@ export default function Home() {
     window.addEventListener('resize', checkIsMobile);
     return () => window.removeEventListener('resize', checkIsMobile);
   }, []);
+
+  // Calculate About Me height to match Experience window height
+  useEffect(() => {
+    const calculateAboutMeHeight = () => {
+      if (isMobile) {
+        // On mobile, find the Experience window element and get its computed height
+        const experienceWindow = document.querySelector('.experience-window');
+        if (experienceWindow && showExperience) {
+          const computedStyle = window.getComputedStyle(experienceWindow);
+          const experienceHeight = computedStyle.height;
+          setAboutMeHeight(experienceHeight);
+        } else {
+          // Default to mobile-window height when Experience window is not visible
+          setAboutMeHeight('calc(100vh - 210px)');
+        }
+      } else {
+        // On desktop, use fixed height
+        setAboutMeHeight('600px'); // Match ExperienceWindow desktop height
+      }
+    };
+
+    // Calculate initially
+    calculateAboutMeHeight();
+
+    // Recalculate when window state changes
+    const timeoutId = setTimeout(calculateAboutMeHeight, 100);
+
+    return () => clearTimeout(timeoutId);
+  }, [isMobile, showExperience, showAbout]);
 
   // Show drag hint when first window opens on desktop
   useEffect(() => {
@@ -287,7 +317,13 @@ export default function Home() {
           /* Mobile: Stack windows vertically */
           <div className="mobile-window-stack">
             {showAbout && (
-              <div className="mobile-window">
+              <div 
+                className="mobile-window"
+                style={{ 
+                  height: isMobile ? aboutMeHeight : undefined,
+                  maxHeight: isMobile ? aboutMeHeight : undefined 
+                }}
+              >
                 <Window 
                   title="About Minh Phong"
                   isActive={activeWindow === 'intro'}
